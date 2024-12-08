@@ -8,6 +8,7 @@ root = tk.Tk()
 root.title("Login")
 root.geometry("1080x600")
 root.configure(bg="#ffffff")
+root.resizable(False, False)
 
 def on_entry_click(event):
     if loginEntry.get() == 'E-mail/Contact No.':
@@ -21,13 +22,22 @@ def on_entry_focusout(event):
         
 def on_pass_click(event):
     if loginPass.get() == 'Password':
-       loginPass.delete(0, END)
-       loginPass.insert(0, '')
-       loginPass.config(fg = 'black')
+        loginPass.delete(0, END)
+        loginPass.config(fg='black', show='*')
+
 def on_pass_focusout(event):
     if loginPass.get() == '':
         loginPass.insert(0, 'Password')
-        loginPass.config(fg = 'grey')
+        loginPass.config(fg='grey', show='')
+
+def toggle_password():
+    if loginPass.cget('show') == '':
+        if loginPass.get() != 'Password':
+            loginPass.config(show='*')
+        toggle_btn.config(text='Show Password')
+    else:
+        loginPass.config(show='')
+        toggle_btn.config(text='Hide Password')
 
 img = Image.open("resources/signin_img.png")
 resized_img = img.resize((550, 400))
@@ -49,12 +59,15 @@ loginEntry.bind('<FocusIn>', on_entry_click)
 loginEntry.bind('<FocusOut>', on_entry_focusout)
 Frame(loginFrame, width=350, height=2, bg="#737d28").pack(side="top")
 
-loginPass = Entry(loginFrame, width=30, font=("Krub", 13), fg="gray", border=0, )
+loginPass = Entry(loginFrame, width=30, font=("Krub", 13), fg="gray", border=0, show='')
 loginPass.pack(side="top", pady=(20, 0))
 loginPass.insert(0, 'Password')
 loginPass.bind('<FocusIn>', on_pass_click)
 loginPass.bind('<FocusOut>', on_pass_focusout)
 Frame(loginFrame, width=350, height=2, bg="#737d28").pack(side="top")
+
+toggle_btn = Button(loginFrame, text='Show Password', font=("Krub", 10), bg="#ffffff", fg="#8d9e36", activebackground="#ffffff", activeforeground="#8d9e36", cursor='hand2', border=0, command=toggle_password)
+toggle_btn.pack(side="top", pady=(10, 0))
 
 signinBtn = Button(loginFrame, text="Sign In", font=("Krub", 10), width=30, bg="#8d9e36", fg="#ffffff", activebackground="#737d28", activeforeground="#ffffff", cursor='hand2', border=0)
 signinBtn.pack(side="top", pady=(30, 10))

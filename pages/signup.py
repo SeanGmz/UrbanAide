@@ -9,6 +9,7 @@ class SignupWindow:
         self.signup_window.title("Sign Up")
         self.signup_window.geometry("1080x600")
         self.signup_window.configure(bg="#ffffff")
+        self.signup_window.resizable(False, False)
 
         # Open and resize the image
         img = Image.open("resources/signin_img.png")
@@ -68,7 +69,7 @@ class SignupWindow:
         self.contactEntry.insert(0, 'Contact no.')
         self.contactEntry.bind('<FocusIn>', self.on_contact_click)
         self.contactEntry.bind('<FocusOut>', self.on_contact_focusout)
-        Frame(contactFrame, width=375, height=2, bg="#737d28").pack(side="top")
+        Frame(contactFrame, width=370, height=2, bg="#737d28").pack(side="top")
         
         # EMAIL SECTION
         emailFrame= Frame(signupFrame, width=470, bg="#ffffff")
@@ -79,7 +80,7 @@ class SignupWindow:
         self.emailEntry.insert(0, 'E-mail')
         self.emailEntry.bind('<FocusIn>', self.on_email_click)
         self.emailEntry.bind('<FocusOut>', self.on_email_focusout)
-        Frame(emailFrame, width=375, height=2, bg="#737d28").pack(side="top")
+        Frame(emailFrame, width=370, height=2, bg="#737d28").pack(side="top")
         
         # PASSWORD SECTION
         passFrame = Frame(signupFrame, width=470, bg="#ffffff")
@@ -90,7 +91,7 @@ class SignupWindow:
         pass1Frame.pack(side="left")
 
         # password entry
-        self.pass1Entry = Entry(pass1Frame, font=("Krub", 13), width=15, border=0,fg="gray")
+        self.pass1Entry = Entry(pass1Frame, font=("Krub", 13), width=15, border=0,fg="gray", show='')
         self.pass1Entry.insert(0, 'Password')
         self.pass1Entry.bind('<FocusIn>', self.on_pass1_click)
         self.pass1Entry.bind('<FocusOut>', self.on_pass1_focusout)
@@ -104,7 +105,7 @@ class SignupWindow:
         pass2Frame.pack(side="left")
 
         # Last name entry
-        self.pass2Entry = Entry(pass2Frame, font=("Krub", 13), width=15, border=0, fg="gray")
+        self.pass2Entry = Entry(pass2Frame, font=("Krub", 13), width=15, border=0, fg="gray", show='')
         self.pass2Entry.insert(0, 'Confirm Password')
         self.pass2Entry.bind('<FocusIn>', self.on_pass2_click)
         self.pass2Entry.bind('<FocusOut>', self.on_pass2_focusout)
@@ -112,6 +113,9 @@ class SignupWindow:
 
         # Add underline for last name entry
         Frame(pass2Frame, width=184, height=2, bg="#737d28").pack(side="top", padx=(2, 0))
+        
+        self.toggle_btn = Button(signupFrame, text='Show Password', font=("Krub", 10), bg="#ffffff", fg="#8d9e36", activebackground="#ffffff", activeforeground="#8d9e36", cursor='hand2', border=0, command=self.toggle_password)
+        self.toggle_btn.pack(side="top", pady=(10, 0))
         
         # Add a sign up button
         signupBtn = Button(signupFrame, text="Sign Up", font=("Krub", 10), width=30, bg="#8d9e36", fg="#ffffff", activebackground="#737d28", activeforeground="#ffffff", cursor='hand2', border=0)
@@ -182,3 +186,24 @@ class SignupWindow:
         if self.pass2Entry.get() == '':
             self.pass2Entry.insert(0, 'Confirm Password')
             self.pass2Entry.config(fg='grey')
+            
+    def toggle_password(self):
+        if self.pass1Entry.cget('show') == '':
+            if self.pass1Entry.get() != 'Password':
+                self.pass1Entry.config(show='*')
+                self.pass2Entry.config(show='*')
+            self.toggle_btn.config(text='Show Password')
+        else:
+            self.pass1Entry.config(show='')
+            self.pass2Entry.config(show='')
+            self.toggle_btn.config(text='Hide Password')
+            
+            
+# def toggle_password():
+#     if loginPass.cget('show') == '':
+#         if loginPass.get() != 'Password':
+#             loginPass.config(show='*')
+#         toggle_btn.config(text='Show Password')
+#     else:
+#         loginPass.config(show='')
+#         toggle_btn.config(text='Hide Password')
