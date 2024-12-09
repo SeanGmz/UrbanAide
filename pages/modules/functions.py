@@ -19,9 +19,10 @@ def create_navbar(root, show_frame, active_page, buttons):
 
     # Add buttons to the navigation bar
     create_nav_button("Events", "EventsPage")
-    create_nav_button("About Us", "AboutPage")
+    create_nav_button("About Us", "AboutUsPage")
     create_nav_button("Profile", "ProfilePage")
 
     # Add the logout button at the bottom
     btn_logout = Button(navbar, text="Logout", font=("Krub", 12), bg="#333333", fg="#ffffff", activebackground="#555555", activeforeground="#ffffff", border=0, command=lambda: print("Logout"))
     btn_logout.pack(side="bottom", fill="x", pady=10)
+    
