@@ -197,13 +197,3 @@ class SignupWindow:
             self.pass1Entry.config(show='')
             self.pass2Entry.config(show='')
             self.toggle_btn.config(text='Hide Password')
-            
-            
-# def toggle_password():
-#     if loginPass.cget('show') == '':
-#         if loginPass.get() != 'Password':
-#             loginPass.config(show='*')
-#         toggle_btn.config(text='Show Password')
-#     else:
-#         loginPass.config(show='')
-#         toggle_btn.config(text='Hide Password')
