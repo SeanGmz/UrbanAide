@@ -3,6 +3,7 @@ from tkinter import messagebox
 from tkinter import *
 from PIL import Image, ImageTk
 from signup import SignupWindow
+from modules.functions import handle_login
 
 root = tk.Tk()
 root.title("Login")
@@ -69,7 +70,7 @@ Frame(loginFrame, width=350, height=2, bg="#737d28").pack(side="top")
 toggle_btn = Button(loginFrame, text='Show Password', font=("Krub", 10), bg="#ffffff", fg="#8d9e36", activebackground="#ffffff", activeforeground="#8d9e36", cursor='hand2', border=0, command=toggle_password)
 toggle_btn.pack(side="top", pady=(10, 0))
 
-signinBtn = Button(loginFrame, text="Sign In", font=("Krub", 10), width=30, bg="#8d9e36", fg="#ffffff", activebackground="#737d28", activeforeground="#ffffff", cursor='hand2', border=0)
+signinBtn = Button(loginFrame, text="Sign In", font=("Krub", 10), width=30, bg="#8d9e36", fg="#ffffff", activebackground="#737d28", activeforeground="#ffffff", cursor='hand2', border=0, command=lambda: handle_login(root, loginEntry, loginPass))
 signinBtn.pack(side="top", pady=(30, 10))
 
 signupFrame = Frame(loginFrame, width=470, height=50, bg="#ffffff")

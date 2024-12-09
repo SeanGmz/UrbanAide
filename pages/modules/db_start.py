@@ -52,6 +52,11 @@ def initialize_db():
     )""")
 
 
-
+    cursor.execute("""
+    INSERT INTO users (user_fname, user_lname, user_contact, user_email, user_pass, user_role) VALUES
+    ('John', 'Doe', '123', 'johnd123@gmail.com', 'john123', 'non_admin')""")
+    
     conn.commit()
     conn.close()
+    
+initialize_db()
