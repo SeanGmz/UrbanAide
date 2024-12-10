@@ -61,5 +61,6 @@ class EventsPage(Frame):
         
         enEventframe = Frame(endedFrame, borderwidth=5, relief="groove", height = 400, width=100)
         enEventframe.pack(side="bottom", fill="both", expand=True)
+        
         ended_event_cards = fetch_events("ended")
         add_event_cards(enEventframe, ended_event_cards, max_columns=2)
