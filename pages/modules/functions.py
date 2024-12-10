@@ -25,7 +25,7 @@ def create_event_card(parent, post_id, title, desc, date_from, date_until, locat
     EventParticipants = Label(PartiFrame, text=f"Participants: {part_count}", font=("krub", 8, "italic"))
     EventParticipants.pack(side="left")
     
-    if status == "ongoing":
+    if status == "ongoing" or status == "ended":
         Expand = Button(PartiFrame, text="Expand", font=("krub", 8), bg="green", fg="white", activebackground="green", activeforeground="white")
         Expand.pack(side="right", padx=5)
     else:
@@ -43,7 +43,7 @@ def add_event_cards(container, cards, max_columns):
         create_event_card(row_frame, *card)
 
 def fetch_events(status):
-    conn = sqlite3.connect('urban.db')
+    conn = sqlite3.connect('urbanaid.db')
     cursor = conn.cursor()
     cursor.execute("""
         SELECT post_id, post_name, post_desc, post_from, post_until, post_location, post_landmark, post_part_count, post_status, post_author 

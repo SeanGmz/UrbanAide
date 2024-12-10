@@ -1,7 +1,7 @@
 import sqlite3
 
 def initialize_db():
-    conn = sqlite3.connect('urban.db')   
+    conn = sqlite3.connect('urbanaid.db')   
     cursor = conn.cursor()
 
     cursor.execute("""
@@ -101,6 +101,38 @@ def initialize_db():
     'test landmark3' AS post_landmark, 
     199 AS post_part_count, 
     'ongoing' AS post_status, 
+    user_fname || ' ' || user_lname AS post_author 
+    FROM users 
+    WHERE user_role = 'admin'
+    """)
+    
+    cursor.execute("""
+    INSERT INTO posts (post_name, post_desc, post_from, post_until, post_location, post_landmark, post_part_count, post_status, post_author) 
+    SELECT
+    'testpost32' AS post_name, 
+    'test post desc32' AS post_desc, 
+    '2025-04-04 12:00:00' AS post_from, 
+    '2025-08-08 12:00:00' AS post_until, 
+    'test location32' AS post_location, 
+    'test landmark3' AS post_landmark, 
+    101 AS post_part_count, 
+    'ended' AS post_status, 
+    user_fname || ' ' || user_lname AS post_author 
+    FROM users 
+    WHERE user_role = 'admin'
+    """)
+     
+    cursor.execute("""
+    INSERT INTO posts (post_name, post_desc, post_from, post_until, post_location, post_landmark, post_part_count, post_status, post_author) 
+    SELECT
+    'testpost31' AS post_name, 
+    'test post desc31' AS post_desc, 
+    '2025-04-04 12:00:00' AS post_from, 
+    '2025-08-08 12:00:00' AS post_until, 
+    'test location3' AS post_location, 
+    'test landmark3' AS post_landmark, 
+    81 AS post_part_count, 
+    'ended' AS post_status, 
     user_fname || ' ' || user_lname AS post_author 
     FROM users 
     WHERE user_role = 'admin'
