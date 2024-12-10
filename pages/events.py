@@ -1,7 +1,7 @@
 import tkinter as tk
 from tkinter import Frame, Label, Button
 import customtkinter
-from pages.modules.functions import create_event_card, add_event_cards, event_cards
+from pages.modules.functions import create_event_card, add_event_cards, fetch_events
 
 class EventsPage(Frame):
     def __init__(self, parent, controller):
@@ -23,8 +23,7 @@ class EventsPage(Frame):
         sortLabel.pack(side="right", pady=10)
         
         
-        
-    
+
         # Container for Ongoing Events section
         ongoingFrame = Frame(eventFrame, borderwidth=5, relief="groove")
         ongoingFrame.pack(side="top", fill="x", expand=True)
@@ -35,8 +34,10 @@ class EventsPage(Frame):
         ogEventframe.pack(side="bottom", fill="both", expand=True)
         
         
+        ongoing_event_cards = fetch_events("ongoing")
+        
         # Add event cards to the container
-        add_event_cards(ogEventframe, event_cards, max_columns=2)
+        add_event_cards(ogEventframe, ongoing_event_cards, max_columns=2)
         
         
         
@@ -47,7 +48,10 @@ class EventsPage(Frame):
         
         upEventframe = Frame(upcomingFrame, borderwidth=5, relief="groove", height = 400, width=100)
         upEventframe.pack(side="bottom", fill="both", expand=True)
-        add_event_cards(upEventframe, event_cards, max_columns=2)
+        
+        upcoming_event_cards = fetch_events("upcoming")
+        add_event_cards(upEventframe, upcoming_event_cards, max_columns=2)
+        
         
         
         # Container for events: Ended Events
@@ -57,4 +61,5 @@ class EventsPage(Frame):
         
         enEventframe = Frame(endedFrame, borderwidth=5, relief="groove", height = 400, width=100)
         enEventframe.pack(side="bottom", fill="both", expand=True)
-        add_event_cards(enEventframe, event_cards, max_columns=2)
+        ended_event_cards = fetch_events("ended")
+        add_event_cards(enEventframe, ended_event_cards, max_columns=2)
