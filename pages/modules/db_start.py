@@ -1,7 +1,7 @@
 import sqlite3
 
 def initialize_db():
-    conn = sqlite3.connect('urbanaid.db')   
+    conn = sqlite3.connect('urbanaid_db.db')   
     cursor = conn.cursor()
 
     cursor.execute("""
@@ -22,6 +22,8 @@ def initialize_db():
         post_desc TEXT NOT NULL,
         post_from DATE NOT NULL,
         post_until DATE NOT NULL,
+        time_from TIME NOT NULL,
+        time_until TIME NOT NULL,
         post_location TEXT NOT NULL,
         post_landmark TEXT,
         post_part_count INTEGER NOT NULL DEFAULT 0,  
@@ -59,12 +61,14 @@ def initialize_db():
     
       
     cursor.execute("""
-    INSERT INTO posts (post_name, post_desc, post_from, post_until, post_location, post_landmark, post_part_count, post_status, post_author) 
+    INSERT INTO posts (post_name, post_desc, post_from, post_until, time_from, time_until, post_location, post_landmark, post_part_count, post_status, post_author) 
     SELECT
     'testpost1' AS post_name, 
     'test post desc1' AS post_desc, 
-    '2024-06-06 12:00:00' AS post_from, 
-    '2024-07-07 12:00:00' AS post_until, 
+    '2024-06-06' AS post_from, 
+    '2024-07-07' AS post_until, 
+    '12:00:00' AS time_from,
+    '14:00:00' AS time_until,
     'test location1' AS post_location, 
     'test landmark1' AS post_landmark, 
     0 AS post_part_count, 
@@ -75,12 +79,14 @@ def initialize_db():
     """)
     
     cursor.execute("""
-    INSERT INTO posts (post_name, post_desc, post_from, post_until, post_location, post_landmark, post_part_count, post_status, post_author) 
+    INSERT INTO posts (post_name, post_desc, post_from, post_until, time_from, time_until, post_location, post_landmark, post_part_count, post_status, post_author) 
     SELECT
     'testpost2' AS post_name, 
     'test post desc2' AS post_desc, 
-    '2024-04-04 12:00:00' AS post_from, 
-    '2024-08-08 12:00:00' AS post_until, 
+    '2024-06-06' AS post_from, 
+    '2024-07-07' AS post_until, 
+    '16:00:00' AS time_from,
+    '19:00:00' AS time_until,
     'test location2' AS post_location, 
     'test landmark2' AS post_landmark, 
     12 AS post_part_count, 
@@ -91,12 +97,14 @@ def initialize_db():
     """)
     
     cursor.execute("""
-    INSERT INTO posts (post_name, post_desc, post_from, post_until, post_location, post_landmark, post_part_count, post_status, post_author) 
+    INSERT INTO posts (post_name, post_desc, post_from, post_until, time_from, time_until, post_location, post_landmark, post_part_count, post_status, post_author) 
     SELECT
     'testpost3' AS post_name, 
     'test post desc3' AS post_desc, 
-    '2025-04-04 12:00:00' AS post_from, 
-    '2025-08-08 12:00:00' AS post_until, 
+    '2024-06-06' AS post_from, 
+    '2024-07-07' AS post_until, 
+    '16:00:00' AS time_from,
+    '19:00:00' AS time_until, 
     'test location3' AS post_location, 
     'test landmark3' AS post_landmark, 
     199 AS post_part_count, 
@@ -107,12 +115,14 @@ def initialize_db():
     """)
     
     cursor.execute("""
-    INSERT INTO posts (post_name, post_desc, post_from, post_until, post_location, post_landmark, post_part_count, post_status, post_author) 
+    INSERT INTO posts (post_name, post_desc, post_from, post_until, time_from, time_until, post_location, post_landmark, post_part_count, post_status, post_author) 
     SELECT
     'testpost32' AS post_name, 
     'test post desc32' AS post_desc, 
-    '2025-04-04 12:00:00' AS post_from, 
-    '2025-08-08 12:00:00' AS post_until, 
+    '2024-06-06' AS post_from, 
+    '2024-07-07' AS post_until, 
+    '16:00:00' AS time_from,
+    '19:00:00' AS time_until,
     'test location32' AS post_location, 
     'test landmark3' AS post_landmark, 
     101 AS post_part_count, 
@@ -123,12 +133,14 @@ def initialize_db():
     """)
      
     cursor.execute("""
-    INSERT INTO posts (post_name, post_desc, post_from, post_until, post_location, post_landmark, post_part_count, post_status, post_author) 
+    INSERT INTO posts (post_name, post_desc, post_from, post_until, time_from, time_until, post_location, post_landmark, post_part_count, post_status, post_author) 
     SELECT
     'testpost31' AS post_name, 
     'test post desc31' AS post_desc, 
-    '2025-04-04 12:00:00' AS post_from, 
-    '2025-08-08 12:00:00' AS post_until, 
+    '2024-06-06' AS post_from, 
+    '2024-07-07' AS post_until, 
+    '16:00:00' AS time_from,
+    '19:00:00' AS time_until,
     'test location3' AS post_location, 
     'test landmark3' AS post_landmark, 
     81 AS post_part_count, 
