@@ -1,9 +1,36 @@
 import tkinter as tk
 from tkinter import *
-from tkinter import Frame, Label, Button
+from tkinter import Frame, Label, Button, messagebox
+import os
 import customtkinter
 from datetime import datetime
 import sqlite3
+
+def authenticate(userinput, password):
+    conn = sqlite3.connect('urbanaid_db.db')
+    cursor = conn.cursor()
+    cursor.execute("SELECT * FROM users WHERE (user_email = ? or user_contact = ?) AND user_pass = ?;", (userinput, userinput, password))
+    user = cursor.fetchone()
+    conn.close()
+    return user
+
+def open_main():
+    os.system('python main.py')
+
+
+def handle_login(root, loginEntry, loginPass):
+    userinput = loginEntry.get()
+    password = loginPass.get()
+
+    user = authenticate(userinput, password)
+    if user:
+        root.destroy()  # Close the login window
+        open_main()  # Open the main application
+    else:
+        messagebox.showerror("Login Failed", "Invalid email or password")
+    
+
+
 
 def create_event_card(parent, post_id, title, desc, date_from, date_until, time_from, time_until, location, landmark, part_count, status, author):
     
