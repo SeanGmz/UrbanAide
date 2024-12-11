@@ -8,6 +8,7 @@ from pages.profile import ProfilePage
 root = tk.Tk()
 root.title("UrbanAid")
 root.geometry("1080x600")
+root.resizable(False, False)
 root.configure(bg="#ffffff")
 
 
