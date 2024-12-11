@@ -39,6 +39,7 @@ def toggle_password():
     else:
         loginPass.config(show='')
         toggle_btn.config(text='Hide Password')
+        
 
 img = Image.open("resources/signin_img.png")
 resized_img = img.resize((550, 400))
