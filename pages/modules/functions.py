@@ -195,3 +195,17 @@ def fetch_events(status):
     conn.close()
 
     return rows
+
+def fetch_user_history(user_id):
+    conn = sqlite3.connect('urbanaid_db.db')
+    cursor = conn.cursor()
+    cursor.execute("""
+        SELECT posts.post_id, posts.post_name, posts.post_desc, posts.post_from, posts.post_until, posts.time_from, posts.time_until, posts.post_location, posts.post_landmark, posts.post_part_count, posts.post_status, posts.post_author
+        FROM posts
+        JOIN participation ON posts.post_id = participation.part_post
+        WHERE participation.part_user = ?
+    """, (user_id,))
+    
+    events = cursor.fetchall()
+    conn.close()
+    return events

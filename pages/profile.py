@@ -1,6 +1,7 @@
 import tkinter as tk
 from tkinter import Frame, Label, Button
 import customtkinter
+from pages.modules.functions import add_event_cards, fetch_user_history
 
 class ProfilePage(Frame):
     def __init__(self, parent, controller):
@@ -46,7 +47,6 @@ class ProfilePage(Frame):
         logged_in_user = self.controller.logged_in_user
         print(f"Updating user details for: {logged_in_user}")
         
-        
         if logged_in_user is not None:
              # Clear existing labels
             for widget in self.personalDetsCol1.winfo_children():
@@ -58,5 +58,14 @@ class ProfilePage(Frame):
             Label(self.personalDetsCol1, text=f"Lastname: {logged_in_user[2]}", font=("Krub", 12), bg="#ffffff").pack(side="top", anchor="w")
             Label(self.personalDetsCol2, text=f"Contact: {logged_in_user[3]}", font=("Krub", 12), bg="#ffffff").pack(side="top", anchor="w")
             Label(self.personalDetsCol2, text=f"Email: {logged_in_user[4]}", font=("Krub", 12), bg="#ffffff").pack(side="top", anchor="w")
+            
+            for widget in self.partHistory.winfo_children():
+                if isinstance(widget, Frame):
+                    widget.destroy()
+                    
+            participation_history = fetch_user_history(logged_in_user[0])
+            add_event_cards(self.partHistory, participation_history, max_columns=3, user_id=logged_in_user[0])
         else:
             print("User not logged in")
+            
+        
