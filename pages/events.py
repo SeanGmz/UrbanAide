@@ -80,17 +80,17 @@ class EventsPage(Frame):
         # Fetch and display ongoing events
         ongoing_event_cards = fetch_events("ongoing")
         print(f"Ongoing events: {ongoing_event_cards}")
-        add_event_cards(self.ogEventframe, ongoing_event_cards, max_columns=2, user_id=logged_in_user[0])
+        add_event_cards(self.ogEventframe, ongoing_event_cards, max_columns=3, user_id=logged_in_user[0])
 
         # Fetch and display upcoming events
         upcoming_event_cards = fetch_events("upcoming")
         print(f"Upcoming events: {upcoming_event_cards}")
-        add_event_cards(self.upEventframe, upcoming_event_cards, max_columns=2, user_id=logged_in_user[0])
+        add_event_cards(self.upEventframe, upcoming_event_cards, max_columns=3, user_id=logged_in_user[0])
 
         # Fetch and display ended events
         ended_event_cards = fetch_events("ended")
         print(f"Ended events: {ended_event_cards}")
-        add_event_cards(self.enEventframe, ended_event_cards, max_columns=2, user_id=logged_in_user[0])
+        add_event_cards(self.enEventframe, ended_event_cards, max_columns=3, user_id=logged_in_user[0])
 
     def sort_events(self, selection):
         if selection == "All":
