@@ -2,7 +2,7 @@
 
 from tkinter import Frame, Button
 
-def create_navbar(parent, show_frame, active_page, buttons, logout):
+def create_navbar(parent, show_frame, active_page, buttons, logout, is_admin = False):
     print("Creating navbar")
     # Create a frame for the navigation bar with increased width
     navbar = Frame(parent, width=270, bg="#333333", height=600, relief="raised", borderwidth=2)
@@ -19,10 +19,15 @@ def create_navbar(parent, show_frame, active_page, buttons, logout):
         button.pack(fill="x", pady=10)
         buttons[page_name] = button
 
-    # Add buttons to the navigation bar
-    create_nav_button("Events", "EventsPage")
-    create_nav_button("About Us", "AboutPage")
-    create_nav_button("Profile", "ProfilePage")
+
+    if is_admin:
+        create_nav_button("Accounts Manager", "AccManagePage")
+        create_nav_button("Event Manager", "EvntManagePage")
+    else:  
+        # Add buttons to the navigation bar
+        create_nav_button("Events", "EventsPage")
+        create_nav_button("About Us", "AboutPage")
+        create_nav_button("Profile", "ProfilePage")
 
     # Add the logout button at the bottom
     logout_button = Button(navbar, text="Logout", font=("Krub", 12), bg="#333333", fg="#ffffff", activebackground="#555555", activeforeground="#ffffff", border=0, command=logout)
