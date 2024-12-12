@@ -5,8 +5,8 @@ class AboutPage(Frame):
     def __init__(self, parent, controller):
         Frame.__init__(self, parent)
         
-        aboutFrame = Frame(self, bg="green", width=800, height=560)
+        aboutFrame = Frame(self, bg="green")
         aboutFrame.pack_propagate(False)
-        aboutFrame.pack()
+        aboutFrame.pack(side="top", fill="both", expand=True)
         
         Label(aboutFrame, text="About Us Page", font=("Krub", 25)).pack()

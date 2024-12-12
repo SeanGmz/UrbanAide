@@ -5,6 +5,7 @@ import os
 import customtkinter
 from datetime import datetime
 import sqlite3
+from pages.modules.navbar import create_navbar
 
 def authenticate(userinput, password):
     conn = sqlite3.connect('urbanaid_db.db')
@@ -14,21 +15,25 @@ def authenticate(userinput, password):
     conn.close()
     return user
 
-def open_main():
-    os.system('python main.py')
+def open_main(controller):
+    if controller.logged_in_user:
+        print("Opening main application")
+        create_navbar(controller.navbar_container, controller.show_frame, "EventsPage", controller.buttons, controller.logout)
+        controller.show_frame("EventsPage")  # Show the profile page
+    else:
+        messagebox.showerror("Error", "User is not logged in.")
 
-
-def handle_login(root, loginEntry, loginPass):
+def handle_login(controller, loginEntry, loginPass):
     userinput = loginEntry.get()
     password = loginPass.get()
 
     user = authenticate(userinput, password)
     if user:
-        root.destroy()  # Close the login window
-        open_main()  # Open the main application
+        controller.logged_in_user = user  # Store the logged-in user
+        print("Login successful:", controller.logged_in_user)
+        open_main(controller)  # Open the main application
     else:
         messagebox.showerror("Login Failed", "Invalid email or password")
-    
 
 
 

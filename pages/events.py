@@ -7,14 +7,19 @@ class EventsPage(Frame):
     def __init__(self, parent, controller):
         Frame.__init__(self, parent)
 
-        eventFrame = customtkinter.CTkScrollableFrame(self, width=800, height=560, fg_color="white")
+        self.controller = controller
+        logged_in_user = self.controller.logged_in_user
+        
+        eventFrame = customtkinter.CTkScrollableFrame(self, width=800, height=580, fg_color="white")
         eventFrame.pack(expand=True, fill="both")
         
         # Container for page title: Events Page
         titleFrame = Frame(eventFrame, borderwidth=5, relief="groove", bg="#ffffff")
         titleFrame.pack(side="top", fill="x")
         Label(titleFrame, text="Events Page", font=("Krub", 25), bg="#ffffff").pack(side="left", padx=10, pady=10)
-        
+        self.userLabel = Label(titleFrame, text="")
+        self.userLabel.pack(side="left")
+
         # SORT DROPDOWN FOR EVENTS
         sortOptions = ["All", "Ongoing", "Upcoming", "Ended"]
         sortFrame = customtkinter.CTkOptionMenu(titleFrame, values = sortOptions, command=self.sort_events, width=120, height=30, font=("Krub", 16), dropdown_font=("Krub", 16), dropdown_fg_color="#e8e8e8", fg_color="#e8e8e8", button_color="#e8e8e8", text_color ="#000000", dropdown_text_color="#000000", button_hover_color="#dddddd", dropdown_hover_color="#dddddd")
@@ -22,8 +27,6 @@ class EventsPage(Frame):
         sortLabel = Label(titleFrame, text="Sort by:", font=("Krub", 12), bg="#ffffff")
         sortLabel.pack(side="right", pady=10)
         
-
-
         # Container for Ongoing Events section
         self.ongoingFrame = Frame(eventFrame, borderwidth=5, relief="groove", bg="#ffffff")
         self.ongoingFrame.pack(side="top", fill="x", expand=True)
@@ -38,8 +41,6 @@ class EventsPage(Frame):
         
         # Add event cards to the container
         add_event_cards(ogEventframe, ongoing_event_cards, max_columns=2)
-        
-        
         
         # Container for events: Upcoming Events
         self.upcomingFrame = Frame(eventFrame, borderwidth=5, relief="groove", bg="#ffffff")
@@ -65,6 +66,16 @@ class EventsPage(Frame):
         ended_event_cards = fetch_events("ended")
         add_event_cards(enEventframe, ended_event_cards, max_columns=2)
         
+        
+    def update_user_details(self):
+        logged_in_user = self.controller.logged_in_user
+        print(f"Updating events page with user: {logged_in_user}")  # Debug information
+        if logged_in_user:
+            self.userLabel.config(text=f"Logged in as: {logged_in_user[1]} {logged_in_user[2]}")
+        else:
+            self.userLabel.config(text="Not logged in")
+
+        
     def sort_events(self, selection):
         if selection == "All":
             self.ongoingFrame.pack(side="top", fill="x", expand=True)
@@ -82,4 +93,4 @@ class EventsPage(Frame):
             self.ongoingFrame.pack_forget()
             self.upcomingFrame.pack_forget()
             self.endedFrame.pack(side="top", fill="x", expand=True)
-            
+    

@@ -1,9 +1,11 @@
-import tkinter as tk
-from tkinter import *
+# FILE: navbar.py
 
-def create_navbar(root, show_frame, active_page, buttons):
+from tkinter import Frame, Button
+
+def create_navbar(parent, show_frame, active_page, buttons, logout):
+    print("Creating navbar")
     # Create a frame for the navigation bar with increased width
-    navbar = Frame(root, width=270, bg="#333333", height=600, relief="raised", borderwidth=2)
+    navbar = Frame(parent, width=270, bg="#333333", height=600, relief="raised", borderwidth=2)
     navbar.pack_propagate(False)
     navbar.pack(side="left", fill="y")
 
@@ -23,5 +25,5 @@ def create_navbar(root, show_frame, active_page, buttons):
     create_nav_button("Profile", "ProfilePage")
 
     # Add the logout button at the bottom
-    btn_logout = Button(navbar, text="Logout", font=("Krub", 12), bg="#333333", fg="#ffffff", activebackground="#555555", activeforeground="#ffffff", border=0, command=lambda: print("Logout"))
-    btn_logout.pack(side="bottom", fill="x", pady=10)
+    logout_button = Button(navbar, text="Logout", font=("Krub", 12), bg="#333333", fg="#ffffff", activebackground="#555555", activeforeground="#ffffff", border=0, command=logout)
+    logout_button.pack(side="bottom", fill="x", pady=10)

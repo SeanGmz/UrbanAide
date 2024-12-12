@@ -5,8 +5,10 @@ import customtkinter
 class ProfilePage(Frame):
     def __init__(self, parent, controller):
         Frame.__init__(self, parent)
-
-        profileFrame = customtkinter.CTkScrollableFrame(self, width=800, height=560, fg_color="white")
+    
+        self.controller = controller
+        
+        profileFrame = customtkinter.CTkScrollableFrame(self, fg_color="white")
         profileFrame.pack(expand=True, fill="both")
         
         titleFrame = Frame(profileFrame, borderwidth=5, relief="groove", bg="#ffffff")
@@ -14,34 +16,47 @@ class ProfilePage(Frame):
         Label(titleFrame, text="Profile Page", font=("Krub", 25), bg="#ffffff").pack(side="left", padx=10, pady=10)
         
         # PROFILE Details
-        profileDetails = Frame(profileFrame, borderwidth=5, relief="groove", bg="#ffffff")
-        profileDetails.pack(side="top", fill="x", expand=True)
+        self.profileDetails = Frame(profileFrame, borderwidth=5, relief="groove", bg="#ffffff")
+        self.profileDetails.pack(side="top", fill="x", expand=True)
         
-        profileToplayer = Frame(profileDetails, bg="#ffffff")
+        profileToplayer = Frame(self.profileDetails, bg="#ffffff")
         profileToplayer.pack(side="top", fill="x", expand=True)
         
         Label(profileToplayer, text="Personal Details:", font=("Krub", 15), bg="#ffffff").pack(side="left", padx=10, pady=10)
         editProfile = Button(profileToplayer, text="Edit Profile", font=("Krub", 11), width=15, bg="#737c29", fg="#ffffff", border=0, activebackground="#666E24", activeforeground="#ffffff", cursor="hand2")
         editProfile.pack(side="right", padx=10, pady=10)
         
-        personalDetails = Frame(profileDetails, bg="#ffffff", borderwidth=5, relief="groove")
-        personalDetails.pack(side="top", fill="x", expand=True, padx=20, pady=20)
+        self.personalDetails = Frame(self.profileDetails, bg="#ffffff", borderwidth=5, relief="groove")
+        self.personalDetails.pack(side="top", fill="x", expand=True, padx=20, pady=20)
         
-        personalDetsCol1 = Frame(personalDetails, bg="#ffffff", borderwidth=5, relief="groove")
-        personalDetsCol1.pack(side="left", fill="x", expand=True)
+        self.personalDetsCol1 = Frame(self.personalDetails, bg="#ffffff", borderwidth=5, relief="groove")
+        self.personalDetsCol1.pack(side="left", fill="x", expand=True)
         
-        personalDetsCol2 = Frame(personalDetails, bg="#ffffff", borderwidth=5, relief="groove")
-        personalDetsCol2.pack(side="left", fill="x", expand=True)
+        self.personalDetsCol2 = Frame(self.personalDetails, bg="#ffffff", borderwidth=5, relief="groove")
+        self.personalDetsCol2.pack(side="left", fill="x", expand=True)
         
-        Label(personalDetsCol1, text="Firstname: ", font=("Krub", 12), bg="#ffffff").pack(side="top", anchor="w")
-        Label(personalDetsCol1, text="Lastname: ", font=("Krub", 12), bg="#ffffff").pack(side="top", anchor="w")
-        Label(personalDetsCol2, text="Contact: ", font=("Krub", 12), bg="#ffffff").pack(side="top", anchor="w")
-        Label(personalDetsCol2, text="Email: ", font=("Krub", 12), bg="#ffffff").pack(side="top", anchor="w")
         
-        # PARTICIPATION HISTORY
+        self.partHistory = Frame(profileFrame, borderwidth=5, relief="groove", bg="#ffffff")
+       
+        self.partHistory.pack(side="top", fill="x", expand=True)
         
-        partHistory = Frame(profileFrame, borderwidth=5, relief="groove", bg="#ffffff")
-        partHistory.pack(side="top", fill="x", expand=True)
+        Label(self.partHistory, text="Participation History", font=("Krub", 15), bg="#ffffff").pack(side="top", anchor="w", padx=10, pady=10)
+    
+    def update_user_details(self):
+        logged_in_user = self.controller.logged_in_user
+        print(f"Updating user details for: {logged_in_user}")
         
-        Label(partHistory, text="Participation History", font=("Krub", 15), bg="#ffffff").pack(side="top", anchor="w", padx=10, pady=10)
-
+        
+        if logged_in_user is not None:
+             # Clear existing labels
+            for widget in self.personalDetsCol1.winfo_children():
+                widget.destroy()
+            for widget in self.personalDetsCol2.winfo_children():
+                widget.destroy()
+            print(f"fuckyou {logged_in_user}")
+            Label(self.personalDetsCol1, text=f"Firstname: {logged_in_user[1]}", font=("Krub", 12), bg="#ffffff").pack(side="top", anchor="w")
+            Label(self.personalDetsCol1, text=f"Lastname: {logged_in_user[2]}", font=("Krub", 12), bg="#ffffff").pack(side="top", anchor="w")
+            Label(self.personalDetsCol2, text=f"Contact: {logged_in_user[3]}", font=("Krub", 12), bg="#ffffff").pack(side="top", anchor="w")
+            Label(self.personalDetsCol2, text=f"Email: {logged_in_user[4]}", font=("Krub", 12), bg="#ffffff").pack(side="top", anchor="w")
+        else:
+            print("User not logged in")
