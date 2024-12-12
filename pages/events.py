@@ -8,7 +8,7 @@ class EventsPage(Frame):
         Frame.__init__(self, parent)
 
         self.controller = controller
-        logged_in_user = self.controller.logged_in_user
+        self.logged_in_user = self.controller.logged_in_user
         
         eventFrame = customtkinter.CTkScrollableFrame(self, width=800, height=580, fg_color="white")
         eventFrame.pack(expand=True, fill="both")
@@ -22,7 +22,7 @@ class EventsPage(Frame):
 
         # SORT DROPDOWN FOR EVENTS
         sortOptions = ["All", "Ongoing", "Upcoming", "Ended"]
-        sortFrame = customtkinter.CTkOptionMenu(titleFrame, values = sortOptions, command=self.sort_events, width=120, height=30, font=("Krub", 16), dropdown_font=("Krub", 16), dropdown_fg_color="#e8e8e8", fg_color="#e8e8e8", button_color="#e8e8e8", text_color ="#000000", dropdown_text_color="#000000", button_hover_color="#dddddd", dropdown_hover_color="#dddddd")
+        sortFrame = customtkinter.CTkOptionMenu(titleFrame, values=sortOptions, command=self.sort_events, width=120, height=30, font=("Krub", 16), dropdown_font=("Krub", 16), dropdown_fg_color="#e8e8e8", fg_color="#e8e8e8", button_color="#e8e8e8", text_color="#000000", dropdown_text_color="#000000", button_hover_color="#dddddd", dropdown_hover_color="#dddddd")
         sortFrame.pack(side="right", padx=(0,10), pady=10)
         sortLabel = Label(titleFrame, text="Sort by:", font=("Krub", 12), bg="#ffffff")
         sortLabel.pack(side="right", pady=10)
@@ -33,49 +33,65 @@ class EventsPage(Frame):
         Label(self.ongoingFrame, text="Ongoing Events", font=("Krub", 15), bg="#ffffff").pack(side="top", anchor='w', padx=10, pady=10)
         
         # Container for Ongoing events
-        ogEventframe = Frame(self.ongoingFrame, borderwidth=5, relief="groove", height=400, width=100, bg="#ffffff")
-        ogEventframe.pack(side="bottom", fill="both", expand=True)
+        self.ogEventframe = Frame(self.ongoingFrame, borderwidth=5, relief="groove", height=400, width=100, bg="#ffffff")
+        self.ogEventframe.pack(side="bottom", fill="both", expand=True)
         
-        
-        ongoing_event_cards = fetch_events("ongoing")
-        
-        # Add event cards to the container
-        add_event_cards(ogEventframe, ongoing_event_cards, max_columns=2)
-        
-        # Container for events: Upcoming Events
+        # Container for Upcoming Events section
         self.upcomingFrame = Frame(eventFrame, borderwidth=5, relief="groove", bg="#ffffff")
         self.upcomingFrame.pack(side="top", fill="x", expand=True)
         Label(self.upcomingFrame, text="Upcoming Events", font=("Krub", 15), bg="#ffffff").pack(side="top", anchor="w", padx=10, pady=10)
         
-        upEventframe = Frame(self.upcomingFrame, borderwidth=5, relief="groove", height = 400, width=100, bg="#ffffff")
-        upEventframe.pack(side="bottom", fill="both", expand=True)
+        self.upEventframe = Frame(self.upcomingFrame, borderwidth=5, relief="groove", height=400, width=100, bg="#ffffff")
+        self.upEventframe.pack(side="bottom", fill="both", expand=True)
         
-        upcoming_event_cards = fetch_events("upcoming")
-        add_event_cards(upEventframe, upcoming_event_cards, max_columns=2)
-        
-        
-        
-        # Container for events: Ended Events
+        # Container for Ended Events section
         self.endedFrame = Frame(eventFrame, borderwidth=5, relief="groove", bg="#ffffff")
         self.endedFrame.pack(side="top", fill="x", expand=True)
         Label(self.endedFrame, text="Ended Events", font=("Krub", 15), bg="#ffffff").pack(side="top", anchor="w", padx=10, pady=10)
         
-        enEventframe = Frame(self.endedFrame, borderwidth=5, relief="groove", height = 400, width=100, bg="#ffffff")
-        enEventframe.pack(side="bottom", fill="both", expand=True)
+        self.enEventframe = Frame(self.endedFrame, borderwidth=5, relief="groove", height=400, width=100, bg="#ffffff")
+        self.enEventframe.pack(side="bottom", fill="both", expand=True)
         
-        ended_event_cards = fetch_events("ended")
-        add_event_cards(enEventframe, ended_event_cards, max_columns=2)
-        
-        
+        self.update_user_details()
+
     def update_user_details(self):
         logged_in_user = self.controller.logged_in_user
         print(f"Updating events page with user: {logged_in_user}")  # Debug information
         if logged_in_user:
             self.userLabel.config(text=f"Logged in as: {logged_in_user[1]} {logged_in_user[2]}")
+            self.refresh_event_frames()
         else:
             self.userLabel.config(text="Not logged in")
 
-        
+    def refresh_event_frames(self):
+        logged_in_user = self.controller.logged_in_user
+        if not logged_in_user:
+            print("No user logged in")
+            return
+
+        # Clear existing event frames
+        for widget in self.ogEventframe.winfo_children():
+            widget.destroy()
+        for widget in self.upEventframe.winfo_children():
+            widget.destroy()
+        for widget in self.enEventframe.winfo_children():
+            widget.destroy()
+
+        # Fetch and display ongoing events
+        ongoing_event_cards = fetch_events("ongoing")
+        print(f"Ongoing events: {ongoing_event_cards}")
+        add_event_cards(self.ogEventframe, ongoing_event_cards, max_columns=2, user_id=logged_in_user[0])
+
+        # Fetch and display upcoming events
+        upcoming_event_cards = fetch_events("upcoming")
+        print(f"Upcoming events: {upcoming_event_cards}")
+        add_event_cards(self.upEventframe, upcoming_event_cards, max_columns=2, user_id=logged_in_user[0])
+
+        # Fetch and display ended events
+        ended_event_cards = fetch_events("ended")
+        print(f"Ended events: {ended_event_cards}")
+        add_event_cards(self.enEventframe, ended_event_cards, max_columns=2, user_id=logged_in_user[0])
+
     def sort_events(self, selection):
         if selection == "All":
             self.ongoingFrame.pack(side="top", fill="x", expand=True)
@@ -86,11 +102,10 @@ class EventsPage(Frame):
             self.upcomingFrame.pack_forget()
             self.endedFrame.pack_forget()
         elif selection == "Upcoming":
-            self.ongoingFrame.pack_forget()
             self.upcomingFrame.pack(side="top", fill="x", expand=True)
+            self.ongoingFrame.pack_forget()
             self.endedFrame.pack_forget()
         elif selection == "Ended":
+            self.endedFrame.pack(side="top", fill="x", expand=True)
             self.ongoingFrame.pack_forget()
             self.upcomingFrame.pack_forget()
-            self.endedFrame.pack(side="top", fill="x", expand=True)
-    

@@ -38,7 +38,7 @@ class UrbanAidApp(tk.Tk):
         def show_frame(page_name):
             print(f"Showing frame: {page_name} with user: {self.logged_in_user}")
             frame = self.frames[page_name]
-            if page_name == "ProfilePage" or page_name == "EventsPage":
+            if page_name == "ProfilePage" or page_name == "EventsPage" or page_name =="AboutPage":
                 frame.update_user_details()
             if page_name == 'LoginPage':
                 frame.reset_entries()
