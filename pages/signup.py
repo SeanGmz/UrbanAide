@@ -1,13 +1,14 @@
 import tkinter as tk
-from tkinter import Toplevel, Frame, Label, Entry, Button
+from tkinter import Toplevel, Frame, Label, Entry, Button, messagebox
 from PIL import Image, ImageTk
+from pages.modules.functions import handle_signup
 
 class SignupWindow:
     def __init__(self, root):
         self.root = root
         self.signup_window = Toplevel(root)
         self.signup_window.title("Sign Up")
-        self.signup_window.geometry("1080x600")
+        self.signup_window.geometry("1280x600")
         self.signup_window.configure(bg="#ffffff")
         self.signup_window.resizable(False, False)
 
@@ -17,12 +18,12 @@ class SignupWindow:
         self.img = ImageTk.PhotoImage(resized_img)
 
         # Create a label to display the image
-        Label(self.signup_window, image=self.img, bg="#ffffff").pack(side="left", padx=(20,0))
+        Label(self.signup_window, image=self.img, bg="#ffffff").pack(side="left", padx=60)
 
         # Create a frame for the signup form
         signupFrame = Frame(self.signup_window, width=470, height=470, bg="#ffffff")
         signupFrame.pack_propagate(False)
-        signupFrame.pack(side="right", padx=(0,20), pady=(20,20))
+        signupFrame.pack(side="right", padx=60, pady=(20,20))
 
         # Add a heading to the signup frame
         heading = Label(signupFrame, text="Sign Up", font=("Krub", 25),bg="#ffffff", fg="#8d9e36")
@@ -118,7 +119,7 @@ class SignupWindow:
         self.toggle_btn.pack(side="top", pady=(10, 0))
         
         # Add a sign up button
-        signupBtn = Button(signupFrame, text="Sign Up", font=("Krub", 10), width=30, bg="#8d9e36", fg="#ffffff", activebackground="#737d28", activeforeground="#ffffff", cursor='hand2', border=0)
+        signupBtn = Button(signupFrame, text="Sign Up", font=("Krub", 10), width=30, bg="#8d9e36", fg="#ffffff", activebackground="#737d28", activeforeground="#ffffff", cursor='hand2', border=0, command=self.signup)
         signupBtn.pack(side="top", pady=(30, 10))
 
     def on_fname_click(self, event):
@@ -197,3 +198,22 @@ class SignupWindow:
             self.pass1Entry.config(show='')
             self.pass2Entry.config(show='')
             self.toggle_btn.config(text='Hide Password')
+    
+    def passwords_match(self):
+        return self.pass1Entry.get() == self.pass2Entry.get()
+    
+    def signup(self):
+        first_name = self.fnameEntry.get()
+        last_name = self.lnameEntry.get()
+        email = self.emailEntry.get()
+        contact = self.contactEntry.get()
+        password = self.pass1Entry.get()
+        role = "non_admin"
+        
+        if not self.passwords_match():
+            messagebox.showerror("Error", "Passwords do not match", parent = self.signup_window)
+            return
+        
+        if handle_signup(self.signup_window, first_name, last_name, email, contact, password, role):
+            self.signup_window.destroy()
+        

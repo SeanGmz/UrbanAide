@@ -35,7 +35,20 @@ def handle_login(controller, loginEntry, loginPass):
     else:
         messagebox.showerror("Login Failed", "Invalid email or password")
 
+def handle_signup(parent, first_name, last_name, email, contact, password, role):
+    if not first_name or not last_name or not email or not contact or not password:
+        messagebox.showerror("Error", "All fields are required", parent = parent)
+        return False
 
+    conn = sqlite3.connect('urbanaid_db.db')
+    cursor = conn.cursor()
+    cursor.execute("INSERT INTO USERS (user_fname,  user_lname, user_email, user_contact, user_pass, user_role) VALUES (?, ?, ?, ?, ?, ?)", (first_name, last_name, email, contact, password, role))
+    
+    conn.commit()
+    conn.close()
+    
+    messagebox.showinfo("Success", "Account created successfully")
+    return True
 
 def create_event_card(parent, post_id, title, desc, date_from, date_until, time_from, time_until, location, landmark, part_count, status, author):
     
