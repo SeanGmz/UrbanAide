@@ -18,22 +18,28 @@ def authenticate(userinput, password):
 def open_main(controller):
     if controller.logged_in_user:
         print("Opening main application")
-        create_navbar(controller.navbar_container, controller.show_frame, "EventsPage", controller.buttons, controller.logout)
-        controller.show_frame("EventsPage")  # Show the profile page
+        controller.create_navbar_and_show_initial_frame()
     else:
         messagebox.showerror("Error", "User is not logged in.")
 
 def handle_login(controller, loginEntry, loginPass):
-    userinput = loginEntry.get()
-    password = loginPass.get()
+# Comment out the login validation logic
+    # userinput = loginEntry.get()
+    # password = loginPass.get()
 
-    user = authenticate(userinput, password)
-    if user:
-        controller.logged_in_user = user  # Store the logged-in user
-        print("Login successful:", controller.logged_in_user)
-        open_main(controller)  # Open the main application
-    else:
-        messagebox.showerror("Login Failed", "Invalid email or password")
+    # user = authenticate(userinput, password)
+    # if user:
+    #     controller.logged_in_user = user  # Store the logged-in user
+    #     controller.is_admin = user[6] == "admin"  # Check if the role is "admin"
+    #     print(f"Login successful: {controller.logged_in_user}, is_admin: {controller.is_admin}")
+    #     open_main(controller)  # Open the main application
+    # else:
+    #     messagebox.showerror("Login Failed", "Invalid email or password")
+
+    # Directly set the logged_in_user and is_admin flags for testing
+    controller.logged_in_user = ("test_user", "Test", "User", "test@example.com", "1234567890", "password", "admin")
+    controller.is_admin = True  # Set to True for admin, False for non-admin
+    open_main(controller)  # Open the main application
 
 def handle_signup(parent, first_name, last_name, email, contact, password, role):
     if not first_name or not last_name or not email or not contact or not password:
@@ -209,3 +215,85 @@ def fetch_user_history(user_id):
     events = cursor.fetchall()
     conn.close()
     return events
+
+
+def table_insert_users(treeview):
+    conn = sqlite3.connect('urbanaid_db.db')
+    cursor = conn.cursor()
+    cursor.execute("SELECT user_id, user_fname, user_lname, user_contact, user_email, user_pass, user_role FROM users")
+    users = cursor.fetchall()
+    conn.close()
+
+    for count, user in enumerate(users):
+        tag = 'evenrow' if count % 2 == 0 else 'oddrow'
+        treeview.insert("", "end", values=user, tags=(tag,))
+
+    treeview.tag_configure("evenrow", background="#f0f0f0")
+    treeview.tag_configure("oddrow", background="#ffffff")
+        
+
+def populate_entries(event, treeview, fnameEntry, lnameEntry, emailEntry, numEntry, passEntry, roleEntry):
+    selected = treeview.focus()
+    values = treeview.item(selected, 'values')
+    if values:
+        fnameEntry.delete(0, tk.END)
+        fnameEntry.insert(0, values[1])
+        lnameEntry.delete(0, tk.END)
+        lnameEntry.insert(0, values[2])
+        emailEntry.delete(0, tk.END)
+        emailEntry.insert(0, values[4])
+        numEntry.delete(0, tk.END)
+        numEntry.insert(0, values[3])
+        passEntry.delete(0, tk.END)
+        passEntry.insert(0, values[5])
+        roleEntry.delete(0, tk.END)
+        roleEntry.insert(0, values[6])
+        
+def clear_entries(fnameEntry, lnameEntry, emailEntry, numEntry, passEntry, roleEntry):
+    fnameEntry.delete(0, tk.END)
+    lnameEntry.delete(0, tk.END)
+    emailEntry.delete(0, tk.END)
+    numEntry.delete(0, tk.END)
+    passEntry.delete(0, tk.END)
+    roleEntry.delete(0, tk.END) 
+        
+    
+def admin_add_user(treeview, fnameEntry, lnameEntry, emailEntry, numEntry, passEntry, roleEntry):
+    conn = sqlite3.connect('urbanaid_db.db')
+    cursor = conn.cursor()
+    cursor.execute("INSERT INTO users (user_fname, user_lname, user_contact, user_email, user_pass, user_role) VALUES (?, ?, ?, ?, ?, ?)",
+                   (fnameEntry.get(), lnameEntry.get(), numEntry.get(), emailEntry.get(), passEntry.get(), roleEntry.get()))
+    conn.commit()
+    new_user_id = cursor.lastrowid
+    conn.close()
+    treeview.insert("", "end", values=(new_user_id, fnameEntry.get(), lnameEntry.get(), numEntry.get(), emailEntry.get(), passEntry.get(), roleEntry.get()))
+    messagebox.showinfo("Success", "User added successfully")
+    
+    clear_entries(fnameEntry, lnameEntry, emailEntry, numEntry, passEntry, roleEntry)
+
+def admin_update_user(treeview, fnameEntry, lnameEntry, emailEntry, numEntry, passEntry, roleEntry):
+    selected = treeview.focus()
+    values = treeview.item(selected, 'values')
+    if values:
+        conn = sqlite3.connect('urbanaid_db.db')
+        cursor = conn.cursor()
+        cursor.execute("UPDATE users SET user_fname = ?, user_lname = ?, user_contact = ?, user_email = ?, user_pass = ?, user_role = ? WHERE user_id = ?",
+                       (fnameEntry.get(), lnameEntry.get(), numEntry.get(), emailEntry.get(), passEntry.get(), roleEntry.get(), values[0]))
+        conn.commit()
+        conn.close()
+        treeview.item(selected, values=(values[0], fnameEntry.get(), lnameEntry.get(), numEntry.get(), emailEntry.get(), passEntry.get(), roleEntry.get()))
+        messagebox.showinfo("Success", "User updated successfully")
+        clear_entries(fnameEntry, lnameEntry, emailEntry, numEntry, passEntry, roleEntry)
+
+def admin_delete_user(treeview, fnameEntry, lnameEntry, emailEntry, numEntry, passEntry, roleEntry):
+    selected = treeview.focus()
+    values = treeview.item(selected, 'values')
+    if values:
+        conn = sqlite3.connect('urbanaid_db.db')
+        cursor = conn.cursor()
+        cursor.execute("DELETE FROM users WHERE user_id = ?", (values[0],))
+        conn.commit()
+        conn.close()
+        treeview.delete(selected)
+        messagebox.showinfo("Success", "Record deleted successfully")
+        clear_entries(fnameEntry, lnameEntry, emailEntry, numEntry, passEntry, roleEntry)
