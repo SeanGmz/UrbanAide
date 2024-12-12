@@ -50,9 +50,39 @@ def handle_signup(parent, first_name, last_name, email, contact, password, role)
     messagebox.showinfo("Success", "Account created successfully")
     return True
 
-def create_event_card(parent, post_id, title, desc, date_from, date_until, time_from, time_until, location, landmark, part_count, status, author):
-    
-    
+def handle_participation(user_id, post_id):
+    conn = sqlite3.connect('urbanaid_db.db')
+    cursor = conn.cursor()
+
+    # Check if the user has already participated in the post
+    cursor.execute("SELECT * FROM participation WHERE part_user = ? AND part_post = ?", (user_id, post_id))
+    participation = cursor.fetchone()
+
+    if participation:
+        # If the user has already participated, remove the participation (unlike)
+        cursor.execute("DELETE FROM participation WHERE part_user = ? AND part_post = ?", (user_id, post_id))
+        cursor.execute("UPDATE posts SET post_part_count = post_part_count - 1 WHERE post_id = ?", (post_id,))
+        conn.commit()
+        conn.close()
+        return "unliked"
+    else:
+        # If the user has not participated, add the participation (like)
+        cursor.execute("INSERT INTO participation (part_user, part_post) VALUES (?, ?)", (user_id, post_id))
+        cursor.execute("UPDATE posts SET post_part_count = post_part_count + 1 WHERE post_id = ?", (post_id,))
+        conn.commit()
+        conn.close()
+        return "liked"
+
+def fetch_user_participation(user_id):
+    conn = sqlite3.connect('urbanaid_db.db')
+    cursor = conn.cursor()
+    cursor.execute("SELECT part_post FROM participation WHERE part_user = ?", (user_id,))
+    participating_user = cursor.fetchall()
+    conn.close()
+    return [p[0] for p in participating_user] 
+
+
+def create_event_card(parent, post_id, title, desc, date_from, date_until, time_from, time_until, location, landmark, part_count, status, author, user_id, user_participation):
     Events = Frame(parent, borderwidth=5, relief="groove", bg="#f0f0f0", width=280, height=180)
     Events.pack_propagate(False)
     Events.pack(side="left", expand=True, padx=20, pady=20)
@@ -82,7 +112,6 @@ def create_event_card(parent, post_id, title, desc, date_from, date_until, time_
     EventParticipants = Label(PartiFrame, text=f"Participants: {part_count}", font=("krub", 8, "italic"), fg="gray", bg="#f0f0f0")
     EventParticipants.pack(side="left")
     
-    
     def show_modal():
         modal = Toplevel(parent, padx=20, pady=10, bg="#ffffff")
         modal.title("Event Details")
@@ -110,26 +139,48 @@ def create_event_card(parent, post_id, title, desc, date_from, date_until, time_
         
         bottomLayer = Frame(modal, bg="#ffffff")
         bottomLayer.pack(side="bottom", fill="x")
-        Label(bottomLayer, text=f"Participants: {part_count}", font=("Krub", 12, "italic"), bg="#ffffff", fg="gray").pack(side="left", anchor="w")
+        expandedPart = Label(bottomLayer, text=f"Participants: {part_count}", font=("Krub", 12, "italic"), bg="#ffffff", fg="gray")
+        expandedPart.pack(side="left", anchor="w")
         minBtn = Button(bottomLayer, text="Minimize", font=("krub", 12), command=modal.destroy, border=0, width=20, bg="#737c29", fg="#ffffff", activebackground="#666E24", activeforeground="#ffffff", cursor="hand2")
         minBtn.pack(side="bottom", anchor="e")
                 
+    def participate():
+        nonlocal part_count
+        result = handle_participation(user_id, post_id)
+        if result == "liked":
+            part_count += 1
+            EventBtn.config(text="Cancel", width=11, bg="#777777", fg="#ffffff", activebackground="#9e9e9e", activeforeground="#ffffff")
+            
+        else:
+            part_count -= 1
+            EventBtn.config(text="Participate", width=11,font=("krub", 9), bg="#737c29", fg="#ffffff", activebackground="#666E24", activeforeground="#ffffff", border=0, cursor="hand2", command=participate)
+            
+        EventParticipants.config(text=f"Participants: {part_count}")
+        expandedPart.config(text=f"Participants: {part_count}")
+
     if status == "ongoing" or status == "ended":
-        Expand = Button(PartiFrame, text="Expand", font=("krub", 9), width=8, command=show_modal, fg="#737c29", bg="#f0f0f0",activeforeground="#666E24", border=0, cursor="hand2")
+        Expand = Button(PartiFrame, text="Expand", font=("krub", 9), command=show_modal, fg="#737c29", bg="#f0f0f0",activeforeground="#666E24", border=0, cursor="hand2")
         Expand.pack(side="right", padx=5)
     else:
-        EventBtn = Button(PartiFrame, text="Participate", font=("krub", 9), bg="#737c29", fg="white", activebackground="#666E24", activeforeground="white", border=0, cursor="hand2")
+        EventBtn = Button(PartiFrame, text="Participate", font=("krub", 9), width=11, bg="#737c29", fg="#ffffff", activebackground="#666E24", activeforeground="#ffffff", border=0, cursor="hand2", command=participate)
+        if post_id in user_participation:
+            EventBtn.config(text="Cancel", font=("krub", 9), width=11, bg="#777777", fg="#ffffff", activebackground="#9e9e9e", activeforeground="#ffffff")
         EventBtn.pack(side="right")
-        Expand = Button(PartiFrame, text="Expand", font=("krub", 9), width=8, command=show_modal, fg="#737c29", bg="#f0f0f0",activeforeground="#666E24", border=0, cursor="hand2")
+        Expand = Button(PartiFrame, text="Expand", font=("krub", 9), command=show_modal, fg="#737c29", bg="#f0f0f0",activeforeground="#666E24", border=0, cursor="hand2")
         Expand.pack(side="right", padx=5)
     
-def add_event_cards(container, cards, max_columns):
+    
+    
+def add_event_cards(container, cards, max_columns, user_id):
+    user_participation = fetch_user_participation(user_id)
     row_frame = None
     for i, card in enumerate(cards):
         if i % max_columns == 0:
             row_frame = Frame(container, bg="#ffffff")
             row_frame.pack(side="top", expand=True)
-        create_event_card(row_frame, *card)
+        create_event_card(row_frame, *card, user_id, user_participation)
+
+
 
 def fetch_events(status):
     conn = sqlite3.connect('urbanaid_db.db')
