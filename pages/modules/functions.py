@@ -36,7 +36,7 @@ def handle_login(controller, loginEntry, loginPass):
     # else:
     #     messagebox.showerror("Login Failed", "Invalid email or password")
 
-    # Directly set the logged_in_user and is_admin flags for testing
+    ## Directly set the logged_in_user and is_admin flags for testing
     controller.logged_in_user = ("test_user", "Test", "User", "test@example.com", "1234567890", "password", "admin")
     controller.is_admin = True  # Set to True for admin, False for non-admin
     open_main(controller)  # Open the main application
@@ -123,6 +123,7 @@ def create_event_card(parent, post_id, title, desc, date_from, date_until, time_
         modal.title("Event Details")
         modal.geometry("700x400")
         
+        modal.grab_set()
         topLayer = Frame(modal, height=50, bg="#ffffff")
         topLayer.pack(side="top", fill="x", pady=10)
         Label(topLayer, text=f"{title}", font=("Krub", 17), bg="#ffffff").pack(side="left", anchor="w")
@@ -297,3 +298,195 @@ def admin_delete_user(treeview, fnameEntry, lnameEntry, emailEntry, numEntry, pa
         treeview.delete(selected)
         messagebox.showinfo("Success", "Record deleted successfully")
         clear_entries(fnameEntry, lnameEntry, emailEntry, numEntry, passEntry, roleEntry)
+        
+
+def fetch_all_events():
+    conn = sqlite3.connect('urbanaid_db.db')
+    cursor = conn.cursor()
+    cursor.execute("SELECT post_id, post_name, post_desc, post_from, post_until, time_from, time_until, post_location, post_landmark, post_part_count, post_status, post_author FROM posts")
+    events = cursor.fetchall()
+    conn.close()
+    return events
+        
+        
+        
+def admin_event_card(parent, post_id, title, desc, date_from, date_until, time_from, time_until, location, landmark, part_count, status, refresh_callback):
+    Event = Frame(parent, borderwidth=5, relief="groove", bg="#f0f0f0", width=800, height=100)
+    Event.pack(side="top", fill="x", expand=True, padx=30, pady=15)
+    
+    Event.post_id = post_id
+    
+    date_from_formatted = datetime.strptime(date_from, "%Y-%m-%d").strftime("%B %d, %Y")
+    date_until_formatted = datetime.strptime(date_until, "%Y-%m-%d").strftime("%B %d, %Y")
+    time_from_formatted = datetime.strptime(time_from, "%H:%M:%S").strftime("%I:%M %p")
+    time_until_formatted = datetime.strptime(time_until, "%H:%M:%S").strftime("%I:%M %p")
+    
+    eventDets = Frame(Event, borderwidth=5, relief="groove", bg="#f0f0f0", width=500)
+    eventDets.pack(side="left", fill="x", expand=True)
+    eventTitle = Label(eventDets, text=title, font=("Krub", 17), bg="#f0f0f0")
+    eventTitle.pack(side="top", anchor="w", padx=10)
+    eventDate = Label(eventDets, text=f"{date_from_formatted} - {date_until_formatted}", font=("Krub", 11), bg="#f0f0f0")
+    eventDate.pack(side="top", anchor="w", padx=10)
+    eventTime = Label(eventDets, text=f" {time_from_formatted} - {time_until_formatted}", font=("Krub", 11), bg="#f0f0f0")
+    eventTime.pack(side="top", anchor="w", padx=10)
+    
+    partstatusCont = Frame(Event, borderwidth=5, relief="groove", bg="#f0f0f0")
+    partstatusCont.pack(side="left", fill="x", expand=True)
+    eventStatus = Label(partstatusCont, text=f"Status: {status}", font=("Krub", 13), bg="#f0f0f0", width=20)
+    eventStatus.pack(side="top", anchor="w")
+    eventParticipants = Label(partstatusCont, text=f"Participants: {part_count}", font=("Krub", 13), bg="#f0f0f0", fg="gray", width=20)
+    eventParticipants.pack(side="top", anchor="w")
+
+    btnCont = Frame(Event, borderwidth=5, relief="groove", bg="#f0f0f0", width=100)
+    btnCont.pack(side="right", fill="both")
+    
+    viewBtn = Button(btnCont, text="View", font=("Krub", 13), bg="#f0f0f0", fg="#737c29", activeforeground="#666E24", activebackground="#f0f0f0", border=0, width=8, height=1, command=lambda: view_event_modal(parent, post_id, title, desc, date_from, date_until, time_from, time_until, location, landmark, status, refresh_callback))
+    viewBtn.pack(side="left", padx=(10, 0))
+    deleteBtn = Button(btnCont, text="Delete", font=("Krub", 13), bg="#f0f0f0", fg="red", activeforeground="darkred", activebackground="#f0f0f0", border=0, width=8, height=1)
+    deleteBtn.pack(side="left", padx=(10, 0))
+    
+def view_event_modal(parent, post_id, title, desc, date_from, date_until, time_from, time_until, location, landmark, status, refresh_callback):
+    modal = Toplevel(parent, bg="#ffffff")
+    modal.title("View Event")
+    modal.geometry("700x500")
+        
+    modal.grab_set()
+    
+    title_var = StringVar(value=title)
+    desc_var = StringVar(value=desc)
+    date_from_var = StringVar(value=date_from)
+    date_until_var = StringVar(value=date_until)
+    time_from_var = StringVar(value=time_from)
+    time_until_var = StringVar(value=time_until)
+    location_var = StringVar(value=location)
+    landmark_var = StringVar(value=landmark)
+    
+    Label(modal, text="View Event", font=("Krub", 18), bg="#ffffff").pack(side="top", anchor="w", pady=(10,20), padx=10)
+        
+    topContainer = Frame(modal, bg="#ffffff")
+    topContainer.pack(side="top", fill="x")
+        
+    leftContainer = Frame(topContainer, bg="#ffffff")
+    leftContainer.pack(side="top", fill="x", expand=True)
+        
+    titleFrame = Frame(leftContainer, bg="#ffffff")
+    titleFrame.pack(side="top", fill="x")
+    
+    Label(titleFrame, text="Title:", font=("Krub", 12), bg="#ffffff").pack(side="left", anchor="w", padx=10, pady=5)
+    titleEntry = customtkinter.CTkEntry(titleFrame, textvariable=title_var,fg_color="#ffffff", bg_color="#ffffff", font=("Krub", 16), text_color="#000000", border_width=1)
+    titleEntry.pack(side="left", fill="x", expand=True, padx=(0,20))
+        
+    locationFrame = Frame(leftContainer, bg="#ffffff")
+    locationFrame.pack(side="top", fill="x")
+        
+    Label(locationFrame, text="Location:", font=("Krub", 12), bg="#ffffff").pack(side="left",anchor="w", padx=10, pady=5)
+    locationEntry = customtkinter.CTkEntry(locationFrame, textvariable=location_var, fg_color="#ffffff", bg_color="#ffffff", font=("Krub", 16), text_color="#000000", border_width=1)
+    locationEntry.pack(side="left", fill="x", expand=True, padx=(0,20))
+        
+    landmarkFrame = Frame(leftContainer, bg="#ffffff")
+    landmarkFrame.pack(side="top", fill="x")
+    Label(landmarkFrame, text="Landmark:", font=("Krub", 12), bg="#ffffff").pack(side="left",anchor="w", padx=10, pady=5)
+    landmarkEntry = customtkinter.CTkEntry(landmarkFrame, textvariable=landmark_var, fg_color="#ffffff", bg_color="#ffffff", font=("Krub", 16), text_color="#000000", border_width=1)
+    landmarkEntry.pack(side="left", fill="x", expand=True, padx=(0,20))
+        
+        
+        
+        # right side of top layer
+    rightContainer = Frame(topContainer, bg="#ffffff")
+    rightContainer.pack(side="top", fill="x", expand=True)
+        
+    dateContainer = Frame(rightContainer, bg="#ffffff",)
+    dateContainer.pack(side="left", fill="x", expand=True)
+        
+    dateFromFrame = Frame(dateContainer, bg="#ffffff")
+    dateFromFrame.pack(side="top", fill="x", expand=True)
+    Label(dateFromFrame, text="Date From (YYYY-MM-DD):", font=("Krub", 12), bg="#ffffff").pack(side="left",anchor="w", padx=10)     
+    dateFromEntry = customtkinter.CTkEntry(dateFromFrame, textvariable=date_from_var , fg_color="#ffffff", bg_color="#ffffff", font=("Krub", 16), text_color="#000000", border_width=1)
+    dateFromEntry.pack(side="left", fill="x", padx=(0,20), pady=5, expand=True)
+        
+    dateUntilFrame = Frame(dateContainer, bg="#ffffff")
+    dateUntilFrame.pack(side="top", fill="x")
+    Label(dateUntilFrame, text="Date Until (YYYY-MM-DD):", font=("Krub", 12), bg="#ffffff").pack(side="left",anchor="w", padx=10)
+    dateUntilEntry = customtkinter.CTkEntry(dateUntilFrame, textvariable=date_until_var, fg_color="#ffffff", bg_color="#ffffff", font=("Krub", 16), text_color="#000000", border_width=1)
+    dateUntilEntry.pack(side="left", fill="x", padx=(0,20), pady=5, expand=True)
+        
+    timeContainer = Frame(rightContainer, bg="#ffffff")
+    timeContainer.pack(side="left", fill="x", expand=True)
+        
+    timeFromFrame = Frame(timeContainer, bg="#ffffff")
+    timeFromFrame.pack(side="top", fill="x", expand=True)
+    Label(timeFromFrame, text="Time From (HH:MM):", font=("Krub", 12), bg="#ffffff").pack(side="left",anchor="w", padx=10)
+    timeFromEntry = customtkinter.CTkEntry(timeFromFrame, textvariable=time_from_var, fg_color="#ffffff", bg_color="#ffffff", font=("Krub", 16), text_color="#000000", border_width=1)
+    timeFromEntry.pack(side="left", fill="x", padx=(0,20), pady=5, expand=True)
+        
+    timeUntilFrame = Frame(timeContainer, bg="#ffffff")
+    timeUntilFrame.pack(side="top", fill="x")
+    Label(timeUntilFrame, text="Time Until (HH:MM):", font=("Krub", 12), bg="#ffffff").pack(side="left",anchor="w", padx=10)
+    timeUntilEntry = customtkinter.CTkEntry(timeUntilFrame, textvariable=time_until_var , fg_color="#ffffff", bg_color="#ffffff", font=("Krub", 16), text_color="#000000", border_width=1)
+    timeUntilEntry.pack(side="left", fill="x", padx=(0,20), pady=5, expand=True)
+        
+        
+    # bottom layer
+    bottomContainer = Frame(modal, bg="#ffffff")
+    bottomContainer.pack(side="top", fill="both", expand=True)
+        
+    Label(bottomContainer, text="Description:", font=("Krub", 12), bg="#ffffff").pack(side="left", anchor="n", padx=10, pady=5)
+    descEntry = customtkinter.CTkTextbox(bottomContainer, height=10, fg_color="#ffffff", bg_color="#ffffff", font=("Krub", 16), text_color="#000000", border_width=1)
+    descEntry.pack(side="left", fill="both", expand=True, padx=(0,20), pady=5)
+    descEntry.insert("1.0", desc)
+
+    submitBtn = Button(modal, text="Update Post", font=("Krub", 12), bg="#8d9e36", fg="#ffffff", width=15, border=0, activebackground="#6d7a2a", activeforeground="#ffffff", cursor='hand2', command=lambda: update_event(post_id, titleEntry, descEntry, dateFromEntry, dateUntilEntry, timeFromEntry, timeUntilEntry, locationEntry, landmarkEntry, refresh_callback))
+    submitBtn.pack(side="right", pady=20, padx=20)
+    cancelBtn = Button(modal, text="Cancel", font=("Krub", 12), bg="#ffffff", fg="#737c29", width=15, border=0, activebackground="#ffffff", activeforeground="#666E24", cursor='hand2', command=modal.destroy)
+    cancelBtn.pack(side="right", pady=20, padx=20)
+        
+def update_event(post_id, titleEntry, descEntry, dateFromEntry, dateUntilEntry, timeFromEntry, timeUntilEntry, locationEntry, landmarkEntry, refresh_callback):
+    title = titleEntry.get()
+    desc = descEntry.get("1.0", "end-1c").strip()
+    date_from = dateFromEntry.get()
+    date_until = dateUntilEntry.get()
+    time_from = timeFromEntry.get()
+    time_until = timeUntilEntry.get()
+    location = locationEntry.get()
+    landmark = landmarkEntry.get()
+    
+    
+    if not all([title, desc, date_from, date_until, time_from, time_until, location, landmark]):
+        messagebox.showerror("Error", "All fields are required")
+        return
+    
+    try:
+        datetime.strptime(date_from, "%Y-%m-%d")
+        datetime.strptime(date_until, "%Y-%m-%d")
+        datetime.strptime(time_from, "%H:%M:%S")
+        datetime.strptime(time_until, "%H:%M:%S")
+    except ValueError:
+        messagebox.showerror("Error", "Invalid date or time format")
+        return
+ 
+    conn = sqlite3.connect('urbanaid_db.db')
+    cursor = conn.cursor()
+    cursor.execute("UPDATE posts SET post_name = ?, post_desc = ?, post_from = ?, post_until = ?, time_from = ?, time_until = ?, post_location = ?, post_landmark = ? WHERE post_id = ?", (title, desc, date_from, date_until, time_from, time_until, location, landmark, post_id))
+    conn.commit()
+    conn.close()
+    messagebox.showinfo("Success", "Event updated successfully")
+    
+    refresh_callback()
+    
+    titleEntry.master.destroy()
+
+
+
+def admin_display_event(container, events, refresh_callback):
+    for event in events:
+        post_id, title, desc, date_from, date_until, time_from, time_until, location, landmark, part_count, status, author = event
+        admin_event_card(container, post_id, title, desc, date_from, date_until, time_from, time_until, location, landmark, part_count, status, refresh_callback)
+        
+def insert_event(title, desc, date_from, date_until, time_from, time_until, location, landmark):
+    conn = sqlite3.connect('urbanaid_db.db')
+    cursor = conn.cursor()
+    cursor.execute("INSERT INTO posts (post_name, post_desc, post_from, post_until, time_from, time_until, post_location, post_landmark, post_part_count, post_status, post_author) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+                   (title, desc, date_from, date_until, time_from, time_until, location, landmark, "0", "upcoming", "2")) # change "2" to user_id
+    conn.commit()
+    conn.close()
+    messagebox.showinfo("Success", "Event posted successfully")
