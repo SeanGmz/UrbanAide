@@ -22,7 +22,7 @@ def create_navbar(parent, show_frame, active_page, buttons, logout, is_admin = F
 
     if is_admin:
         create_nav_button("Accounts Manager", "AccManagePage")
-        create_nav_button("Event Manager", "EvntManagePage")
+        create_nav_button("Event Manager", "EvManagePage")
     else:  
         # Add buttons to the navigation bar
         create_nav_button("Events", "EventsPage")
