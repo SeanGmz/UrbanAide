@@ -42,8 +42,8 @@ class LoginPage(Frame):
         self.loginPass.bind('<FocusOut>', self.on_pass_focusout)
         Frame(loginFrame, width=350, height=2, bg="#737d28").pack(side="top")
 
-        toggle_btn = Button(loginFrame, text='Show Password', font=("Krub", 10), bg="#ffffff", fg="#8d9e36", activebackground="#ffffff", activeforeground="#8d9e36", cursor='hand2', border=0, command=self.toggle_password)
-        toggle_btn.pack(side="top", pady=(10, 0))
+        self.toggle_btn = Button(loginFrame, text='Show Password', font=("Krub", 10), bg="#ffffff", fg="#8d9e36", activebackground="#ffffff", activeforeground="#8d9e36", cursor='hand2', border=0, command=self.toggle_password)
+        self.toggle_btn.pack(side="top", pady=(10, 0))
 
         signinBtn = Button(loginFrame, text="Sign In", font=("Krub", 10), width=30, bg="#8d9e36", fg="#ffffff", activebackground="#737d28", activeforeground="#ffffff", cursor='hand2', border=0, command=self.login)
         signinBtn.pack(side="top", pady=(30, 10))
@@ -80,10 +80,10 @@ class LoginPage(Frame):
         if self.loginPass.cget('show') == '':
             if self.loginPass.get() != 'Password':
                 self.loginPass.config(show='*')
-            toggle_btn.config(text='Show Password')
+            self.toggle_btn.config(text='Show Password')
         else:
             self.loginPass.config(show='')
-            toggle_btn.config(text='Hide Password')
+            self.toggle_btn.config(text='Hide Password')
 
     def login(self):
         handle_login(self.controller, self.loginEntry, self.loginPass)

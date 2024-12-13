@@ -24,22 +24,22 @@ def open_main(controller):
 
 def handle_login(controller, loginEntry, loginPass):
 # Comment out the login validation logic
-    # userinput = loginEntry.get()
-    # password = loginPass.get()
+    userinput = loginEntry.get()
+    password = loginPass.get()
 
-    # user = authenticate(userinput, password)
-    # if user:
-    #     controller.logged_in_user = user  # Store the logged-in user
-    #     controller.is_admin = user[6] == "admin"  # Check if the role is "admin"
-    #     print(f"Login successful: {controller.logged_in_user}, is_admin: {controller.is_admin}")
-    #     open_main(controller)  # Open the main application
-    # else:
-    #     messagebox.showerror("Login Failed", "Invalid email or password")
+    user = authenticate(userinput, password)
+    if user:
+        controller.logged_in_user = user  # Store the logged-in user
+        controller.is_admin = user[6] == "admin"  # Check if the role is "admin"
+        print(f"Login successful: {controller.logged_in_user}, is_admin: {controller.is_admin}")
+        open_main(controller)  # Open the main application
+    else:
+        messagebox.showerror("Login Failed", "Invalid email or password")
 
-    ## Directly set the logged_in_user and is_admin flags for testing
-    controller.logged_in_user = ("test_user", "Test", "User", "test@example.com", "1234567890", "password", "admin")
-    controller.is_admin = True  # Set to True for admin, False for non-admin
-    open_main(controller)  # Open the main application
+    # ## Directly set the logged_in_user and is_admin flags for testing
+    # controller.logged_in_user = ("test_user", "Test", "User", "test@example.com", "1234567890", "password", "admin")
+    # controller.is_admin = True  # Set to True for admin, False for non-admin
+    # open_main(controller)  # Open the main application
 
 def handle_signup(parent, first_name, last_name, email, contact, password, role):
     if not first_name or not last_name or not email or not contact or not password:
@@ -311,7 +311,7 @@ def fetch_all_events():
         
         
 def admin_event_card(parent, post_id, title, desc, date_from, date_until, time_from, time_until, location, landmark, part_count, status, refresh_callback):
-    Event = Frame(parent, borderwidth=5, relief="groove", bg="#f0f0f0", width=800, height=100)
+    Event = Frame(parent, borderwidth=5, relief="flat", bg="#f0f0f0", width=800, height=100)
     Event.pack(side="top", fill="x", expand=True, padx=30, pady=15)
     
     Event.post_id = post_id
@@ -321,7 +321,7 @@ def admin_event_card(parent, post_id, title, desc, date_from, date_until, time_f
     time_from_formatted = datetime.strptime(time_from, "%H:%M:%S").strftime("%I:%M %p")
     time_until_formatted = datetime.strptime(time_until, "%H:%M:%S").strftime("%I:%M %p")
     
-    eventDets = Frame(Event, borderwidth=5, relief="groove", bg="#f0f0f0", width=500)
+    eventDets = Frame(Event, bg="#f0f0f0", width=500)
     eventDets.pack(side="left", fill="x", expand=True)
     eventTitle = Label(eventDets, text=title, font=("Krub", 17), bg="#f0f0f0")
     eventTitle.pack(side="top", anchor="w", padx=10)
@@ -330,19 +330,19 @@ def admin_event_card(parent, post_id, title, desc, date_from, date_until, time_f
     eventTime = Label(eventDets, text=f" {time_from_formatted} - {time_until_formatted}", font=("Krub", 11), bg="#f0f0f0")
     eventTime.pack(side="top", anchor="w", padx=10)
     
-    partstatusCont = Frame(Event, borderwidth=5, relief="groove", bg="#f0f0f0")
+    partstatusCont = Frame(Event, bg="#f0f0f0")
     partstatusCont.pack(side="left", fill="x", expand=True)
     eventStatus = Label(partstatusCont, text=f"Status: {status}", font=("Krub", 13), bg="#f0f0f0", width=20)
     eventStatus.pack(side="top", anchor="w")
     eventParticipants = Label(partstatusCont, text=f"Participants: {part_count}", font=("Krub", 13), bg="#f0f0f0", fg="gray", width=20)
     eventParticipants.pack(side="top", anchor="w")
 
-    btnCont = Frame(Event, borderwidth=5, relief="groove", bg="#f0f0f0", width=100)
+    btnCont = Frame(Event, bg="#f0f0f0", width=100)
     btnCont.pack(side="right", fill="both")
     
     viewBtn = Button(btnCont, text="View", font=("Krub", 13), bg="#f0f0f0", fg="#737c29", activeforeground="#666E24", activebackground="#f0f0f0", border=0, width=8, height=1, command=lambda: view_event_modal(parent, post_id, title, desc, date_from, date_until, time_from, time_until, location, landmark, status, refresh_callback))
     viewBtn.pack(side="left", padx=(10, 0))
-    deleteBtn = Button(btnCont, text="Delete", font=("Krub", 13), bg="#f0f0f0", fg="red", activeforeground="darkred", activebackground="#f0f0f0", border=0, width=8, height=1)
+    deleteBtn = Button(btnCont, text="Delete", font=("Krub", 13), bg="#f0f0f0", fg="red", activeforeground="darkred", activebackground="#f0f0f0", border=0, width=8, height=1, command=lambda: delete_event(post_id, refresh_callback))
     deleteBtn.pack(side="left", padx=(10, 0))
     
 def view_event_modal(parent, post_id, title, desc, date_from, date_until, time_from, time_until, location, landmark, status, refresh_callback):
@@ -360,6 +360,7 @@ def view_event_modal(parent, post_id, title, desc, date_from, date_until, time_f
     time_until_var = StringVar(value=time_until)
     location_var = StringVar(value=location)
     landmark_var = StringVar(value=landmark)
+    status_var = StringVar(value=status)
     
     Label(modal, text="View Event", font=("Krub", 18), bg="#ffffff").pack(side="top", anchor="w", pady=(10,20), padx=10)
         
@@ -373,9 +374,16 @@ def view_event_modal(parent, post_id, title, desc, date_from, date_until, time_f
     titleFrame.pack(side="top", fill="x")
     
     Label(titleFrame, text="Title:", font=("Krub", 12), bg="#ffffff").pack(side="left", anchor="w", padx=10, pady=5)
-    titleEntry = customtkinter.CTkEntry(titleFrame, textvariable=title_var,fg_color="#ffffff", bg_color="#ffffff", font=("Krub", 16), text_color="#000000", border_width=1)
+    titleEntry = customtkinter.CTkEntry(titleFrame, textvariable=title_var, fg_color="#ffffff", bg_color="#ffffff", font=("Krub", 16), text_color="#000000", border_width=1)
     titleEntry.pack(side="left", fill="x", expand=True, padx=(0,20))
-        
+
+
+    Label(titleFrame, text="Status:", font=("Krub", 12), bg="#ffffff").pack(side="left", anchor="w", pady=5)
+    statusOptions = ["ongoing", "upcoming", "ended"]
+    statusMenu = customtkinter.CTkOptionMenu(titleFrame, variable=status_var, values=statusOptions, width=130, height=40, font=("Krub", 16), dropdown_font=("Krub", 16), dropdown_fg_color="#f0f0f0", fg_color="#f0f0f0", button_color="#f0f0f0", text_color="#000000", dropdown_text_color="#000000", button_hover_color="#dddddd", dropdown_hover_color="#dddddd")
+    statusMenu.pack(side="left", fill="x", padx=(0,20), pady=5)
+
+    
     locationFrame = Frame(leftContainer, bg="#ffffff")
     locationFrame.pack(side="top", fill="x")
         
@@ -435,12 +443,12 @@ def view_event_modal(parent, post_id, title, desc, date_from, date_until, time_f
     descEntry.pack(side="left", fill="both", expand=True, padx=(0,20), pady=5)
     descEntry.insert("1.0", desc)
 
-    submitBtn = Button(modal, text="Update Post", font=("Krub", 12), bg="#8d9e36", fg="#ffffff", width=15, border=0, activebackground="#6d7a2a", activeforeground="#ffffff", cursor='hand2', command=lambda: update_event(post_id, titleEntry, descEntry, dateFromEntry, dateUntilEntry, timeFromEntry, timeUntilEntry, locationEntry, landmarkEntry, refresh_callback))
+    submitBtn = Button(modal, text="Update Post", font=("Krub", 12), bg="#8d9e36", fg="#ffffff", width=15, border=0, activebackground="#6d7a2a", activeforeground="#ffffff", cursor='hand2', command=lambda: update_event(post_id, titleEntry, descEntry, dateFromEntry, dateUntilEntry, timeFromEntry, timeUntilEntry, locationEntry, landmarkEntry, status_var.get(), refresh_callback))
     submitBtn.pack(side="right", pady=20, padx=20)
     cancelBtn = Button(modal, text="Cancel", font=("Krub", 12), bg="#ffffff", fg="#737c29", width=15, border=0, activebackground="#ffffff", activeforeground="#666E24", cursor='hand2', command=modal.destroy)
     cancelBtn.pack(side="right", pady=20, padx=20)
         
-def update_event(post_id, titleEntry, descEntry, dateFromEntry, dateUntilEntry, timeFromEntry, timeUntilEntry, locationEntry, landmarkEntry, refresh_callback):
+def update_event(post_id, titleEntry, descEntry, dateFromEntry, dateUntilEntry, timeFromEntry, timeUntilEntry, locationEntry, landmarkEntry, status, refresh_callback):
     title = titleEntry.get()
     desc = descEntry.get("1.0", "end-1c").strip()
     date_from = dateFromEntry.get()
@@ -449,9 +457,10 @@ def update_event(post_id, titleEntry, descEntry, dateFromEntry, dateUntilEntry, 
     time_until = timeUntilEntry.get()
     location = locationEntry.get()
     landmark = landmarkEntry.get()
+
     
     
-    if not all([title, desc, date_from, date_until, time_from, time_until, location, landmark]):
+    if not all([title, desc, date_from, date_until, time_from, time_until, location, landmark, status]):
         messagebox.showerror("Error", "All fields are required")
         return
     
@@ -466,7 +475,7 @@ def update_event(post_id, titleEntry, descEntry, dateFromEntry, dateUntilEntry, 
  
     conn = sqlite3.connect('urbanaid_db.db')
     cursor = conn.cursor()
-    cursor.execute("UPDATE posts SET post_name = ?, post_desc = ?, post_from = ?, post_until = ?, time_from = ?, time_until = ?, post_location = ?, post_landmark = ? WHERE post_id = ?", (title, desc, date_from, date_until, time_from, time_until, location, landmark, post_id))
+    cursor.execute("UPDATE posts SET post_name = ?, post_desc = ?, post_from = ?, post_until = ?, time_from = ?, time_until = ?, post_location = ?, post_landmark = ?,  post_status = ? WHERE post_id = ?", (title, desc, date_from, date_until, time_from, time_until, location, landmark, status, post_id))
     conn.commit()
     conn.close()
     messagebox.showinfo("Success", "Event updated successfully")
@@ -490,3 +499,12 @@ def insert_event(title, desc, date_from, date_until, time_from, time_until, loca
     conn.commit()
     conn.close()
     messagebox.showinfo("Success", "Event posted successfully")
+
+def delete_event(post_id, refresh_callback):
+    conn = sqlite3.connect('urbanaid_db.db')
+    cursor = conn.cursor()
+    cursor.execute("DELETE FROM posts WHERE post_id = ?", (post_id,))
+    conn.commit()
+    conn.close()
+    messagebox.showinfo("Success", "Event deleted successfully")
+    refresh_callback()
