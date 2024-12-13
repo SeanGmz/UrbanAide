@@ -11,30 +11,31 @@ class EvManagePage(Frame):
         self.controller = controller
         self.logged_in_user = self.controller.logged_in_user
         
-        postsFrame = customtkinter.CTkScrollableFrame(self, width=800, height=580, fg_color="white")
+        postsFrame = customtkinter.CTkScrollableFrame(self, width=800, height=580, fg_color="white", scrollbar_button_color="#8d9e36", scrollbar_button_hover_color="#6d7a2a")
         postsFrame.pack(expand=True, fill="both")
         
         # Container for page title: Events Page
-        titleFrame = Frame(postsFrame, borderwidth=5, relief="groove", bg="#ffffff")
+        titleFrame = Frame(postsFrame, bg="#ffffff")
         titleFrame.pack(side="top", fill="x")
         Label(titleFrame, text="Events Manager", font=("Krub", 25), bg="#ffffff").pack(side="left", padx=10, pady=10)
-        
 
         # Search bar for events
-        
-        
-        postsCont = Frame(postsFrame, borderwidth=5, relief="groove", bg="#ffffff")
+    
+        postsCont = Frame(postsFrame, bg="#ffffff")
         postsCont.pack(side="top", fill="both", expand=True)
-        postHeader = Frame(postsCont, bg="#ffffff")
+        postHeader = Frame(postsCont, bg="#ffffff", padx=10)
         postHeader.pack(side="top", fill="x")
         
-        searchFrame = Frame(postHeader, borderwidth=5, relief="groove", bg="#ffffff")
+        searchFrame = Frame(postHeader, bg="#ffffff")
         searchFrame.pack(side="left", fill="x", expand=True)
         Label(searchFrame, text="Search:", font=("Krub", 15), bg="#ffffff").pack(side="left", pady=10)
-        searchEntry = customtkinter.CTkEntry(searchFrame, fg_color="#ffffff", bg_color="#ffffff", font=("Krub", 16), text_color="#000000")
-        searchEntry.pack(side="left", fill="x", expand=True, padx=(0,50), pady=10)
+        self.searchEntry = customtkinter.CTkEntry(searchFrame, fg_color="#ffffff", bg_color="#ffffff", font=("Krub", 16), text_color="gray", border_width=1)
+        self.searchEntry.pack(side="left", fill="x", expand=True, padx=(0,50), pady=10)
 
-
+        self.searchEntry.insert(0, "Search events...")
+        self.searchEntry.bind("<FocusIn>", self.clear_placeholder)
+        self.searchEntry.bind("<FocusOut>", self.add_placeholder)
+        self.searchEntry.bind("<KeyRelease>", self.search_events)
         
         addEventbtn = Button(postHeader, text="Create Event", font=("Krub", 12), bg="#8d9e36", fg="#ffffff", width=15, border=0, activebackground="#6d7a2a", activeforeground="#ffffff", cursor='hand2', command=self.create_event_modal)
         addEventbtn.pack(side="right", padx=(20,10))
@@ -45,11 +46,21 @@ class EvManagePage(Frame):
         sortLabel = Label(postHeader, text="Sort by:", font=("Krub", 12), bg="#ffffff")
         sortLabel.pack(side="right", pady=10)
         
-        self.eventsCont = Frame(postsCont, borderwidth=5, relief="groove", bg="#ffffff")
+        self.eventsCont = Frame(postsCont, bg="#ffffff")
         self.eventsCont.pack(side="bottom", fill="both", expand=True)
         
         # Fetch and display events
         self.refresh_events()
+        
+    def clear_placeholder(self, event):
+        if self.searchEntry.get() == "Search events...":
+            self.searchEntry.delete(0, tk.END)
+            self.searchEntry.configure(text_color="#000000")
+    
+    def add_placeholder(self, event):
+        if self.searchEntry.get() == "":
+            self.searchEntry.insert(0, "Search events...")
+            self.searchEntry.configure(text_color="gray")
     
     def refresh_events(self, status=None):
         for widget in self.eventsCont.winfo_children():
@@ -70,6 +81,17 @@ class EvManagePage(Frame):
         
     def sort_events(self, selected_status):  
         self.refresh_events(selected_status)  
+        
+    def search_events(self, event=None):
+        query = self.searchEntry.get().lower()
+        all_events = fetch_all_events()
+        filtered_events = [event for event in all_events if query in event[1].lower()]
+        self.display_filtered_events(filtered_events)
+    
+    def display_filtered_events(self, events):
+        for widget in self.eventsCont.winfo_children():
+            widget.destroy()
+        admin_display_event(self.eventsCont, events, self.refresh_events)
         
     def create_event_modal(self):
         modal = Toplevel(self, bg="#ffffff")

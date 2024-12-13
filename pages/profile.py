@@ -9,10 +9,10 @@ class ProfilePage(Frame):
     
         self.controller = controller
         
-        profileFrame = customtkinter.CTkScrollableFrame(self, fg_color="white")
+        profileFrame = customtkinter.CTkScrollableFrame(self, fg_color="white", scrollbar_button_color="#8d9e36", scrollbar_button_hover_color="#6d7a2a")
         profileFrame.pack(expand=True, fill="both")
         
-        titleFrame = Frame(profileFrame, borderwidth=5, relief="groove", bg="#ffffff")
+        titleFrame = Frame(profileFrame, bg="#ffffff")
         titleFrame.pack(side="top", fill="x")
         Label(titleFrame, text="Profile Page", font=("Krub", 25), bg="#ffffff").pack(side="left", padx=10, pady=10)
         
@@ -37,12 +37,13 @@ class ProfilePage(Frame):
         self.personalDetsCol2.pack(side="left", fill="x", expand=True)
         
         
-        self.partHistory = Frame(profileFrame, borderwidth=5, relief="groove", bg="#ffffff")
+        self.partHistory = Frame(profileFrame, bg="#ffffff")
        
         self.partHistory.pack(side="top", fill="x", expand=True)
         
         Label(self.partHistory, text="Participation History", font=("Krub", 15), bg="#ffffff").pack(side="top", anchor="w", padx=10, pady=10)
-    
+        self.cont = Frame(self.partHistory, bg="#ffffff", borderwidth=5, relief="groove")
+        self.cont.pack(side="top", fill="both", expand=True)
     def update_user_details(self):
         logged_in_user = self.controller.logged_in_user
         print(f"Updating user details for: {logged_in_user}")
@@ -53,18 +54,18 @@ class ProfilePage(Frame):
                 widget.destroy()
             for widget in self.personalDetsCol2.winfo_children():
                 widget.destroy()
-            print(f"fuckyou {logged_in_user}")
+            print(f"{logged_in_user}")
             Label(self.personalDetsCol1, text=f"Firstname: {logged_in_user[1]}", font=("Krub", 12), bg="#ffffff").pack(side="top", anchor="w")
             Label(self.personalDetsCol1, text=f"Lastname: {logged_in_user[2]}", font=("Krub", 12), bg="#ffffff").pack(side="top", anchor="w")
             Label(self.personalDetsCol2, text=f"Contact: {logged_in_user[3]}", font=("Krub", 12), bg="#ffffff").pack(side="top", anchor="w")
             Label(self.personalDetsCol2, text=f"Email: {logged_in_user[4]}", font=("Krub", 12), bg="#ffffff").pack(side="top", anchor="w")
             
-            for widget in self.partHistory.winfo_children():
+            for widget in self.cont.winfo_children():
                 if isinstance(widget, Frame):
                     widget.destroy()
                     
             participation_history = fetch_user_history(logged_in_user[0])
-            add_event_cards(self.partHistory, participation_history, max_columns=3, user_id=logged_in_user[0])
+            add_event_cards(self.cont, participation_history, max_columns=3, user_id=logged_in_user[0])
         else:
             print("User not logged in")
             

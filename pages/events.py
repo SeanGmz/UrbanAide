@@ -10,15 +10,13 @@ class EventsPage(Frame):
         self.controller = controller
         self.logged_in_user = self.controller.logged_in_user
         
-        eventFrame = customtkinter.CTkScrollableFrame(self, width=800, height=580, fg_color="white")
+        eventFrame = customtkinter.CTkScrollableFrame(self, width=800, height=580, fg_color="white", scrollbar_button_color="#8d9e36", scrollbar_button_hover_color="#6d7a2a")
         eventFrame.pack(expand=True, fill="both")
         
         # Container for page title: Events Page
-        titleFrame = Frame(eventFrame, borderwidth=5, relief="groove", bg="#ffffff")
+        titleFrame = Frame(eventFrame, bg="#ffffff")
         titleFrame.pack(side="top", fill="x")
         Label(titleFrame, text="Events Page", font=("Krub", 25), bg="#ffffff").pack(side="left", padx=10, pady=10)
-        self.userLabel = Label(titleFrame, text="")
-        self.userLabel.pack(side="left")
 
         # SORT DROPDOWN FOR EVENTS
         sortOptions = ["All", "Ongoing", "Upcoming", "Ended"]
@@ -28,7 +26,7 @@ class EventsPage(Frame):
         sortLabel.pack(side="right", pady=10)
         
         # Container for Ongoing Events section
-        self.ongoingFrame = Frame(eventFrame, borderwidth=5, relief="groove", bg="#ffffff")
+        self.ongoingFrame = Frame(eventFrame, bg="#ffffff")
         self.ongoingFrame.pack(side="top", fill="x", expand=True)
         Label(self.ongoingFrame, text="Ongoing Events", font=("Krub", 15), bg="#ffffff").pack(side="top", anchor='w', padx=10, pady=10)
         
@@ -37,7 +35,7 @@ class EventsPage(Frame):
         self.ogEventframe.pack(side="bottom", fill="both", expand=True)
         
         # Container for Upcoming Events section
-        self.upcomingFrame = Frame(eventFrame, borderwidth=5, relief="groove", bg="#ffffff")
+        self.upcomingFrame = Frame(eventFrame, bg="#ffffff")
         self.upcomingFrame.pack(side="top", fill="x", expand=True)
         Label(self.upcomingFrame, text="Upcoming Events", font=("Krub", 15), bg="#ffffff").pack(side="top", anchor="w", padx=10, pady=10)
         
@@ -45,7 +43,7 @@ class EventsPage(Frame):
         self.upEventframe.pack(side="bottom", fill="both", expand=True)
         
         # Container for Ended Events section
-        self.endedFrame = Frame(eventFrame, borderwidth=5, relief="groove", bg="#ffffff")
+        self.endedFrame = Frame(eventFrame, bg="#ffffff")
         self.endedFrame.pack(side="top", fill="x", expand=True)
         Label(self.endedFrame, text="Ended Events", font=("Krub", 15), bg="#ffffff").pack(side="top", anchor="w", padx=10, pady=10)
         
@@ -57,10 +55,7 @@ class EventsPage(Frame):
     def update_user_details(self):
         logged_in_user = self.controller.logged_in_user
         if logged_in_user:
-            self.userLabel.config(text=f"Logged in as: {logged_in_user[1]} {logged_in_user[2]}")
             self.refresh_event_frames()
-        else:
-            self.userLabel.config(text="Not logged in")
 
     def refresh_event_frames(self):
         logged_in_user = self.controller.logged_in_user
