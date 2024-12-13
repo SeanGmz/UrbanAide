@@ -56,7 +56,6 @@ class EventsPage(Frame):
 
     def update_user_details(self):
         logged_in_user = self.controller.logged_in_user
-        print(f"Updating events page with user: {logged_in_user}")  # Debug information
         if logged_in_user:
             self.userLabel.config(text=f"Logged in as: {logged_in_user[1]} {logged_in_user[2]}")
             self.refresh_event_frames()
@@ -66,7 +65,6 @@ class EventsPage(Frame):
     def refresh_event_frames(self):
         logged_in_user = self.controller.logged_in_user
         if not logged_in_user:
-            print("No user logged in")
             return
 
         # Clear existing event frames
@@ -79,17 +77,14 @@ class EventsPage(Frame):
 
         # Fetch and display ongoing events
         ongoing_event_cards = fetch_events("ongoing")
-        print(f"Ongoing events: {ongoing_event_cards}")
         add_event_cards(self.ogEventframe, ongoing_event_cards, max_columns=3, user_id=logged_in_user[0])
 
         # Fetch and display upcoming events
         upcoming_event_cards = fetch_events("upcoming")
-        print(f"Upcoming events: {upcoming_event_cards}")
         add_event_cards(self.upEventframe, upcoming_event_cards, max_columns=3, user_id=logged_in_user[0])
 
         # Fetch and display ended events
         ended_event_cards = fetch_events("ended")
-        print(f"Ended events: {ended_event_cards}")
         add_event_cards(self.enEventframe, ended_event_cards, max_columns=3, user_id=logged_in_user[0])
 
     def sort_events(self, selection):
